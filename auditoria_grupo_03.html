@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditoría de la Seguridad de la Información · UNJFSC Equipo N.º 03</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            abyss: '#050a14',
+            panel: '#0f172a',
+            panelLight: '#162036',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* =========================================================================
+       VARIABLES DINÁMICAS DE ACENTO POR EXPOSITOR Y TRANSICIONES GLOBALES
+       ========================================================================= */
+    :root {
+      --accent: #22d3ee;
+      --accent-rgb: 34, 211, 238;
+      --accent-soft: rgba(34, 211, 238, 0.14);
+      --accent-glow: rgba(34, 211, 238, 0.35);
+      --bg-abyss: #050a14;
+      --bg-panel: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background-color: var(--bg-abyss);
+      color: #f1f5f9;
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fondo técnico con cuadrícula sutil y halo dinámico por expositor */
+    .bg-cyber-grid {
+      background-color: #050a14;
+      background-image:
+        radial-gradient(circle at 15% 12%, rgba(var(--accent-rgb), 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(var(--accent-rgb), 0.10) 0%, transparent 42%),
+        linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 38px 38px, 38px 38px;
+      transition: background-image 0.55s ease, color 0.5s ease;
+    }
+
+    /* Clases utilitarias acopladas a las variables dinámicas */
+    .accent-text {
+      color: var(--accent);
+      transition: color 0.5s ease;
+    }
+
+    .accent-bg {
+      background-color: var(--accent);
+      transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .accent-bg-soft {
+      background-color: var(--accent-soft);
+      transition: background-color 0.5s ease, border-color 0.5s ease;
+    }
+
+    .accent-border {
+      border-color: rgba(var(--accent-rgb), 0.45);
+      transition: border-color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .accent-glow {
+      box-shadow: 0 0 24px -4px var(--accent-glow);
+      transition: box-shadow 0.5s ease;
+    }
+
+    /* Paneles estilo dashboard */
+    .dash-card {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(11, 18, 33, 0.94) 100%);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      backdrop-filter: blur(12px);
+      transition: all 0.35s ease;
+    }
+
+    .dash-card-interactive:hover {
+      border-color: rgba(var(--accent-rgb), 0.5);
+      box-shadow: 0 8px 28px -10px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .dash-card-active {
+      border-color: var(--accent) !important;
+      background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.14) 0%, rgba(15, 23, 42, 0.96) 100%) !important;
+      box-shadow: 0 0 22px -6px var(--accent-glow);
+    }
+
+    /* Animación de entrada de diapositivas */
+    @keyframes slideEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(12px) scale(0.992);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .slide-animate {
+      animation: slideEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Pulso para el indicador de inicio de bloque */
+    @keyframes pulseBeacon {
+      0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.7);
+      }
+      50% {
+        opacity: 0.75;
+        box-shadow: 0 0 0 7px rgba(var(--accent-rgb), 0);
+      }
+    }
+
+    .beacon-dot {
+      animation: pulseBeacon 2s infinite;
+    }
+
+    /* Scrollbar sutil solo dentro del contenedor interno si la altura es reducida */
+    .thin-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .thin-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 999px;
+    }
+    .thin-scroll::-webkit-scrollbar-thumb {
+      background: rgba(var(--accent-rgb), 0.38);
+      border-radius: 999px;
+    }
+    .thin-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(var(--accent-rgb), 0.65);
+    }
+
+    /* Sangría francesa para referencias APA 7.ª edición */
+    .apa-ref {
+      padding-left: 2rem;
+      text-indent: -2rem;
+    }
+
+    /* Transiciones de barra de acento superior */
+    .top-accent-line {
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+      transition: background 0.5s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-cyber-grid h-screen w-screen overflow-hidden flex flex-col select-none">
+
+  <!-- Línea luminosa superior que refleja el color del expositor actual -->
+  <div class="top-accent-line w-full shrink-0"></div>
+
+  <!-- =========================================================================
+       BARRA SUPERIOR FIJA (HEADER DASHBOARD)
+       ========================================================================= -->
+  <header class="shrink-0 h-16 px-4 sm:px-6 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl flex items-center justify-between gap-3 z-30">
+    <!-- Izquierda: Identidad + Pill del expositor -->
+    <div class="flex items-center gap-3 min-w-0">
+      <button onclick="goToSlide(0)" title="Volver a la portada" class="flex items-center gap-2.5 group focus:outline-none">
+        <div class="w-9 h-9 rounded-xl accent-bg-soft border accent-border flex items-center justify-center accent-glow shrink-0">
+          <!-- Escudo de Auditoría SVG -->
+          <svg class="w-5 h-5 accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="text-left leading-tight hidden sm:block">
+          <div class="font-mono text-[11px] font-semibold tracking-wider uppercase accent-text">UNJFSC · EQUIPO N.º 03</div>
+          <div class="text-xs text-slate-400 font-medium truncate max-w-[210px] lg:max-w-none">Auditoría de la Seguridad · 2026</div>
+        </div>
+      </button>
+
+      <div class="h-6 w-px bg-slate-800 hidden md:block"></div>
+
+      <!-- Pill dinámico del expositor actual -->
+      <div id="header-speaker-pill" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full accent-bg-soft border accent-border text-xs font-medium text-slate-100 max-w-[300px]">
+        <span class="w-2 h-2 rounded-full accent-bg beacon-dot shrink-0"></span>
+        <span id="header-block-label" class="font-mono font-bold accent-text shrink-0">B1</span>
+        <span class="text-slate-500">·</span>
+        <span id="header-speaker-name" class="truncate">Alcantara Coca, Cristhian Diego</span>
+      </div>
+    </div>
+
+    <!-- Derecha: 4 Botones obligatorios del Dashboard -->
+    <nav class="flex items-center gap-1.5 sm:gap-2 shrink-0" aria-label="Herramientas de presentación">
+      <button onclick="openModal('modal-map')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/70 hover:border-slate-500 text-slate-200 text-xs sm:text-sm font-medium transition-all cursor-pointer" title="Mapa de diapositivas (M)">
+        <svg class="w-4 h-4 accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        <span class="hidden sm:inline">Mapa</span>
+      </button>
+
+      <button onclick="openModal('modal-notes')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/70 hover:border-slate-500 text-slate-200 text-xs sm:text-sm font-medium transition-all cursor-pointer" title="Ideas clave de la diapositiva actual">
+        <svg class="w-4 h-4 accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18h6"/>
+          <path d="M10 22h4"/>
+          <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>
+        </svg>
+        <span class="hidden sm:inline">Ideas clave</span>
+      </button>
+
+      <button onclick="openModal('modal-sources')" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/70 hover:border-slate-500 text-slate-200 text-xs sm:text-sm font-medium transition-all cursor-pointer" title="Fuentes bibliográficas APA 7.ª ed.">
+        <svg class="w-4 h-4 accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        <span class="hidden sm:inline">Fuentes</span>
+      </button>
+
+      <button id="btn-fullscreen" onclick="toggleFullscreen()" class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl accent-bg-soft border accent-border hover:brightness-110 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer" title="Modo pantalla completa">
+        <svg id="icon-fs-enter" class="w-4 h-4 accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 3 21 3 21 9"/>
+          <polyline points="9 21 3 21 3 15"/>
+          <line x1="21" y1="3" x2="14" y2="10"/>
+          <line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>
+        <svg id="icon-fs-exit" class="w-4 h-4 accent-text hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 14 10 14 10 20"/>
+          <polyline points="20 10 14 10 14 4"/>
+          <line x1="14" y1="10" x2="21" y2="3"/>
+          <line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>
+        <span id="label-fullscreen" class="hidden sm:inline">Presentar</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- =========================================================================
+       ÁREA CENTRAL DE DIAPOSITIVAS (100% DEL ESPACIO RESTANTE, SIN SCROLL INFINITO)
+       ========================================================================= -->
+  <main id="slide-stage" class="flex-1 min-h-0 relative overflow-hidden flex flex-col">
+    <!-- Contenedor interno con scroll suave únicamente si la pantalla es muy baja -->
+    <div id="slide-scroll-wrapper" class="flex-1 min-h-0 overflow-y-auto thin-scroll px-4 sm:px-8 lg:px-10 py-4 sm:py-5 flex flex-col">
+      <div class="max-w-7xl w-full mx-auto flex-1 flex flex-col justify-center">
+        <!-- Banner dinámico de Inicio / Cierre de Bloque -->
+        <div id="block-status-bar" class="mb-3 flex flex-wrap items-center justify-between gap-2"></div>
+
+        <!-- Contenido renderizado dinámicamente para la diapositiva activa -->
+        <div id="slide-content" class="slide-animate flex-1 flex flex-col justify-center"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       BARRA INFERIOR FIJA (FOOTER CONTROL DECK CON PROGRESO SEGMENTADO EN 6 COLORES)
+       ========================================================================= -->
+  <footer class="shrink-0 h-20 sm:h-[74px] px-4 sm:px-6 border-t border-slate-800/80 bg-slate-950/90 backdrop-blur-xl flex items-center justify-between gap-3 z-30">
+    <!-- Izquierda: Avatar con iniciales + Nombre del expositor + Etiqueta de bloque -->
+    <div class="flex items-center gap-3 min-w-0 w-auto sm:w-[290px] lg:w-[340px]">
+      <div id="footer-avatar" class="w-10 h-10 rounded-xl accent-bg text-slate-950 font-mono font-bold text-sm flex items-center justify-center shrink-0 shadow-lg">
+        AC
+      </div>
+      <div class="min-w-0 leading-tight">
+        <div class="flex items-center gap-2">
+          <span id="footer-block-tag" class="font-mono text-[10px] font-bold uppercase px-1.5 py-0.5 rounded accent-bg-soft accent-text border accent-border">BLOQUE 01</span>
+          <span id="footer-block-slides" class="font-mono text-[10px] text-slate-400 hidden sm:inline">SLIDES 01–02</span>
+        </div>
+        <div id="footer-speaker-name" class="text-xs sm:text-sm font-semibold text-slate-100 truncate mt-0.5">
+          Alcantara Coca, Cristhian Diego
+        </div>
+      </div>
+    </div>
+
+    <!-- Centro: Barra de progreso segmentada en 6 colores + Contador numérico -->
+    <div class="flex-1 max-w-xl hidden md:flex flex-col items-center gap-1.5">
+      <div class="w-full flex items-center justify-between text-[11px] font-mono">
+        <span id="footer-slide-short-title" class="text-slate-400 truncate max-w-[78%]">Portada Dashboard & Mapa de Equipo</span>
+        <span id="footer-counter" class="font-bold accent-text">01 / 12</span>
+      </div>
+      <!-- 6 segmentos clicables con los colores exactos de cada integrante -->
+      <div id="segmented-progress" class="w-full grid grid-cols-6 gap-1.5" role="navigation" aria-label="Progreso por expositor"></div>
+    </div>
+
+    <!-- Derecha: Contador móvil + Botones Anterior / Siguiente -->
+    <div class="flex items-center gap-2 shrink-0">
+      <span id="footer-counter-mobile" class="md:hidden font-mono text-xs font-bold accent-text mr-1">01/12</span>
+
+      <button id="btn-prev" onclick="prevSlide()" class="flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-35 disabled:pointer-events-none border border-slate-700/80 text-slate-200 text-xs sm:text-sm font-medium transition-all cursor-pointer">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        <span class="hidden sm:inline">Anterior</span>
+      </button>
+
+      <button id="btn-next" onclick="nextSlide()" class="flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl accent-bg text-slate-950 hover:brightness-110 disabled:opacity-35 disabled:pointer-events-none font-semibold text-xs sm:text-sm transition-all cursor-pointer shadow-lg">
+        <span class="hidden sm:inline">Siguiente</span>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODAL 1: MAPA DE DIAPOSITIVAS (AGRUPADO POR LOS 6 EXPOSITORES)
+       ========================================================================= -->
+  <div id="modal-map" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" onclick="backdropClose(event, 'modal-map')">
+    <div class="w-full max-w-5xl max-h-[88vh] flex flex-col rounded-2xl bg-slate-900 border border-slate-700/80 shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-wider accent-text">Navegación Rápida · 6 Bloques · 12 Diapositivas</span>
+          <h2 class="text-lg font-bold text-white">Mapa General de la Exposición</h2>
+        </div>
+        <button onclick="closeAllModals()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer" aria-label="Cerrar mapa">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="modal-map-body" class="p-6 overflow-y-auto thin-scroll grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: IDEAS CLAVE (GUION DE EXPOSICIÓN DE LA SLIDE ACTUAL)
+       ========================================================================= -->
+  <div id="modal-notes" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" onclick="backdropClose(event, 'modal-notes')">
+    <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-2xl bg-slate-900 border accent-border shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <span id="notes-meta" class="font-mono text-xs uppercase tracking-wider accent-text">GUION DE EXPOSICIÓN</span>
+          <h2 id="notes-title" class="text-lg font-bold text-white">Ideas clave de la diapositiva</h2>
+        </div>
+        <button onclick="closeAllModals()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer" aria-label="Cerrar ideas clave">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="modal-notes-body" class="p-6 overflow-y-auto thin-scroll space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: FUENTES BIBLIOGRÁFICAS (21 REFERENCIAS APA 7.ª EDICIÓN)
+       ========================================================================= -->
+  <div id="modal-sources" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" onclick="backdropClose(event, 'modal-sources')">
+    <div class="w-full max-w-4xl max-h-[88vh] flex flex-col rounded-2xl bg-slate-900 border border-slate-700/80 shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-wider accent-text">Formato APA 7.ª Edición · Orden Alfabético · Sangría Francesa</span>
+          <h2 class="text-lg font-bold text-white">Referencias Bibliográficas (21 Fuentes)</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="source-filter" type="text" oninput="renderSourcesList(this.value)" placeholder="Filtrar autor, norma o año..." class="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-400 w-52" />
+          <button onclick="closeAllModals()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer" aria-label="Cerrar fuentes">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="modal-sources-body" class="p-6 overflow-y-auto thin-scroll space-y-3 text-sm text-slate-200 leading-relaxed select-text"></div>
+    </div>
+  </div>
+
+  <!-- Toast de notificaciones sutil (sin usar alert) -->
+  <div id="toast-box" class="fixed bottom-24 right-6 z-50 hidden px-4 py-2.5 rounded-xl bg-slate-900/95 border accent-border text-xs font-medium text-slate-100 shadow-2xl backdrop-blur-md"></div>
+
+  <!-- =========================================================================
+       LÓGICA JAVASCRIPT COMPLETA (DATOS, ESTADO, INTERACTIVIDAD Y RENDERIZADO)
+       ========================================================================= -->
+  <script>
+    /* -------------------------------------------------------------------------
+       1. CONFIGURACIÓN DE LOS 6 EXPOSITORES Y SU PALETA DINÁMICA
+       ------------------------------------------------------------------------- */
+    const SPEAKERS = [
+      {
+        id: 1,
+        block: 'Bloque 01',
+        shortBlock: 'B1',
+        name: 'Alcantara Coca, Cristhian Diego',
+        initials: 'AC',
+        hex: '#22d3ee',
+        rgb: '34, 211, 238',
+        colorName: 'Cian Neón',
+        slideRange: '01–02',
+        startIndex: 0,
+        topic: 'Portada, Fundamentos, Tríada CIA y Enfoques de Evaluación'
+      },
+      {
+        id: 2,
+        block: 'Bloque 02',
+        shortBlock: 'B2',
+        name: 'Camones Castillo, Carlos Eduardo',
+        initials: 'CC',
+        hex: '#10b981',
+        rgb: '16, 185, 129',
+        colorName: 'Esmeralda Neón',
+        slideRange: '03–04',
+        startIndex: 2,
+        topic: 'Estándares Internacionales y Marco Regulatorio Peruano'
+      },
+      {
+        id: 3,
+        block: 'Bloque 03',
+        shortBlock: 'B3',
+        name: 'Castillo Robles, Bruno Eber',
+        initials: 'CR',
+        hex: '#a855f7',
+        rgb: '168, 85, 247',
+        colorName: 'Violeta Eléctrico',
+        slideRange: '05–06',
+        startIndex: 4,
+        topic: 'Metodología, Evidencia, Hallazgos, Criticidad CVSS y Dictámenes'
+      },
+      {
+        id: 4,
+        block: 'Bloque 04',
+        shortBlock: 'B4',
+        name: 'Herrera Clavijo, Franzoad Eduardo',
+        initials: 'HC',
+        hex: '#f59e0b',
+        rgb: '245, 158, 11',
+        colorName: 'Ámbar Neón',
+        slideRange: '07–08',
+        startIndex: 6,
+        topic: 'Seguridad Física, Redes, Zero Trust, IAM/PAM y Hardening'
+      },
+      {
+        id: 5,
+        block: 'Bloque 05',
+        shortBlock: 'B5',
+        name: 'Nuñez Li, Mathew Scott',
+        initials: 'NL',
+        hex: '#f43f5e',
+        rgb: '244, 63, 94',
+        colorName: 'Rosa Cibernético',
+        slideRange: '09–10',
+        startIndex: 8,
+        topic: 'Bases de Datos, Criptografía, DevSecOps y Auditoría Cloud'
+      },
+      {
+        id: 6,
+        block: 'Bloque 06',
+        shortBlock: 'B6',
+        name: 'Povis Ocaña, Samuel Josias',
+        initials: 'PO',
+        hex: '#38bdf8',
+        rgb: '56, 189, 248',
+        colorName: 'Azul Cielo',
+        slideRange: '11–12',
+        startIndex: 10,
+        topic: 'Caso Práctico Financiera Andina, Continuidad, Tendencias y Cierre'
+      }
+    ];
+
+    /* -------------------------------------------------------------------------
+       2. METADATOS DE LAS 12 DIAPOSITIVAS E IDEAS CLAVE ("GUION")
+       ------------------------------------------------------------------------- */
+    const SLIDES = [
+      {
+        num: '01',
+        speakerId: 1,
+        isBlockStart: true,
+        isBlockEnd: false,
+        title: 'Portada Dashboard & Mapa de Equipo',
+        subtitle: 'Presentación institucional del Equipo N.º 03 y recorrido temático por expositor.',
+        notes: [
+          'Presentar formalmente a la UNJFSC, la Escuela Profesional de Ingeniería de Sistemas, el curso de Auditoría de TI y al docente Ing. Fernando Sosimo Costilla Retuerto.',
+          'Explicar por qué la auditoría de seguridad hoy es un pilar del gobierno corporativo y no una simple revisión técnica reactiva.',
+          'Mostrar cómo está estructurada la exposición en 6 bloques de color, uno por cada integrante del Equipo N.º 03, culminando con un caso práctico interactivo.'
+        ]
+      },
+      {
+        num: '02',
+        speakerId: 1,
+        isBlockStart: false,
+        isBlockEnd: true,
+        title: 'Fundamentos, Tríada CIA Ampliada y Enfoques de Evaluación',
+        subtitle: 'Propiedades de la información, diferenciación frente a vulnerabilidades/pentesting y ética profesional.',
+        notes: [
+          'Resaltar que la auditoría de seguridad abarca activos digitales, físicos, humanos y procedimentales (alcance más amplio que la ciberseguridad pura).',
+          'Hacer clic en los pilares CIA y ampliados para explicar cómo se audita cada propiedad (ej. cifrado para confidencialidad, firmas digitales para no repudio).',
+          'Contrastar las 3 pestañas: la auditoría evalúa el sistema global de control contra criterios; el pentesting simula un ataque real para explotar brechas.',
+          'Cerrar el bloque recalcando la independencia de hecho y en apariencia exigida por el marco ITAF de ISACA (quien diseña no audita).'
+        ]
+      },
+      {
+        num: '03',
+        speakerId: 2,
+        isBlockStart: true,
+        isBlockEnd: false,
+        title: 'Estándares Internacionales de Auditoría y Seguridad',
+        subtitle: 'Criterios objetivos de referencia: ISO/IEC 27001:2022, NIST CSF 2.0, COBIT 2019, CIS, PCI-DSS y OWASP.',
+        notes: [
+          'Destacar el cambio clave de ISO/IEC 27001:2022 y 27002:2022: consolidación a 93 controles en 4 bloques y 11 controles nuevos (como nube e inteligencia de amenazas).',
+          'Explicar la 6.ª función de NIST CSF 2.0 ("Gobernar"), que eleva la ciberseguridad a decisión de directorio, complementada por las 20 familias de NIST SP 800-53.',
+          'Mostrar en las pestañas cómo COBIT 2019 (APO13 y DSS05) mide madurez CMMI, CIS v8.1 prioriza ciberhigiene (IG1–IG3) y PCI-DSS/OWASP cubren pagos y apps.'
+        ]
+      },
+      {
+        num: '04',
+        speakerId: 2,
+        isBlockStart: false,
+        isBlockEnd: true,
+        title: 'Marco Regulatorio Peruano Auditable',
+        subtitle: 'Obligaciones legales vigentes en el Perú verificables en auditorías de seguridad de TI.',
+        notes: [
+          'Ley N.º 29733: obligatoria para toda entidad pública o privada que trate datos personales; auditable mediante inscripción de bancos, consentimiento y derechos ARCO.',
+          'Decreto Legislativo N.º 1412: exige en el sector público designar un Oficial de Seguridad y Confianza Digital e implementar SGSI bajo NTP-ISO/IEC 27001.',
+          'Resolución SBS N.º 504-2021: estándar estricto del sistema financiero peruano; exige autenticación reforzada, hacking ético por terceros y auditoría interna anual obligatoria.'
+        ]
+      },
+      {
+        num: '05',
+        speakerId: 3,
+        isBlockStart: true,
+        isBlockEnd: false,
+        title: 'Metodología, Ciclo de Vida y Obtención de Evidencia',
+        subtitle: 'Enfoque basado en riesgos, pruebas de diseño vs. eficacia operativa, herramientas CAATs y atributos ITAF.',
+        notes: [
+          'Recorrer el stepper de 4 fases enfatizando que una auditoría eficaz se decide desde la Planificación basada en riesgos y la Carta de Compromiso.',
+          'Aclarar la diferencia crítica: una prueba de diseño verifica si el control está bien concebido; la prueba de eficacia operativa comprueba que funcionó todo el año.',
+          'Destacar el uso de CAATs (scripts Python, ACL, Nessus, OpenSCAP) para auditar el 100 % de poblaciones masivas y los 4 atributos de evidencia válida (ITAF).'
+        ]
+      },
+      {
+        num: '06',
+        speakerId: 3,
+        isBlockStart: false,
+        isBlockEnd: true,
+        title: 'Estructura del Hallazgo, Criticidad CVSS y Dictámenes',
+        subtitle: 'Formulación rigurosa de no conformidades, matriz de severidad y opiniones profesionales.',
+        notes: [
+          'Explicar los 5 elementos del hallazgo formal haciendo clic en cada tarjeta: atacar solo el síntoma (condición) sin erradicar la causa raíz hace que el fallo se repita.',
+          'Mostrar cómo se priorizan los plazos de remediación combinando impacto de negocio con rangos CVSS (Crítico 9.0–10.0 en 24h a 15 días).',
+          'Diferenciar los 4 tipos de dictamen de auditoría y señalar que la auditoría solo cierra cuando se verifica evidencia objetiva del Plan de Acción Correctiva (CAP).'
+        ]
+      },
+      {
+        num: '07',
+        speakerId: 4,
+        isBlockStart: true,
+        isBlockEnd: false,
+        title: 'Seguridad Física, Redes Perimetrales y Zero Trust',
+        subtitle: 'Defensa en profundidad desde el centro de datos físico hasta la microsegmentación de Confianza Cero.',
+        notes: [
+          'Iniciar aclarando que ninguna ciberseguridad lógica resiste un acceso físico sin control a servidores o respaldos (biometría, CCTV, UPS, agentes limpios).',
+          'En Redes y Perímetro, resaltar la auditoría de reglas de firewall bajo denegación por defecto, segmentación VLAN/DMZ y WPA3-Enterprise 802.1X.',
+          'En la tercera pestaña, explicar cómo Zero Trust (NIST SP 800-207) elimina la confianza implícita por red y exige verificación continua mediante PDP/PEP.'
+        ]
+      },
+      {
+        num: '08',
+        speakerId: 4,
+        isBlockStart: false,
+        isBlockEnd: true,
+        title: 'Auditoría de IAM/PAM y Endurecimiento de Servidores',
+        subtitle: 'Control del ciclo de vida de identidades, privilegios elevados, CIS Benchmarks y registro centralizado.',
+        notes: [
+          'Señalar que el compromiso de credenciales legítimas es uno de los vectores más frecuentes en brechas corporativas.',
+          'Hacer clic en las tarjetas para demostrar pruebas CAAT concretas: cruce de bajas de RR. HH. contra Active Directory y validación de Segregación de Funciones (SoD).',
+          'Subrayar la importancia del MFA resistente a phishing, bóvedas PAM Just-in-Time, endurecimiento contra CIS Benchmarks y centralización inmutable de logs con NTP.'
+        ]
+      },
+      {
+        num: '09',
+        speakerId: 5,
+        isBlockStart: true,
+        isBlockEnd: false,
+        title: 'Bases de Datos, Criptografía y DevSecOps',
+        subtitle: 'Seguridad embebida en el ciclo de desarrollo (SSDLC), compuertas CI/CD y protección criptográfica de datos.',
+        notes: [
+          'Navegar las 5 etapas del pipeline DevSecOps para mostrar que la auditoría aplicativa no espera a producción, sino que empieza desde el modelado de amenazas.',
+          'Explicar los controles automatizados en CI/CD: SAST (código fuente), SCA (librerías de terceros), escaneo de secretos y DAST frente a OWASP Top 10.',
+          'En la capa de Datos, enfatizar TLS 1.3 en tránsito, AES-256 en reposo, claves en HSM/KMS (nunca en código) y enmascaramiento de datos en ambientes QA.'
+        ]
+      },
+      {
+        num: '10',
+        speakerId: 5,
+        isBlockStart: false,
+        isBlockEnd: true,
+        title: 'Auditoría en la Nube y Responsabilidad Compartida',
+        subtitle: 'Simulador interactivo IaaS / PaaS / SaaS y evidencias objetivas en entornos cloud.',
+        notes: [
+          'Usar el simulador IaaS / PaaS / SaaS en vivo para demostrar cómo cambia la frontera de responsabilidad, pero que Datos e Identidades siempre recaen en el cliente.',
+          'Diferenciar la seguridad DE la nube (validada con reportes SOC 2 Tipo II y CSA CCM v4.0) frente a la seguridad EN la nube (auditada directamente al cliente).',
+          'Mencionar los puntos críticos de revisión cloud: cuenta raíz con MFA, buckets privados, logs nativos (CloudTrail/Activity Log) y herramientas CSPM como Prowler/ScoutSuite.'
+        ]
+      },
+      {
+        num: '11',
+        speakerId: 6,
+        isBlockStart: true,
+        isBlockEnd: false,
+        title: 'Caso Práctico Interactivo: Financiera Andina S.A.',
+        subtitle: 'Aplicación real sobre entidad financiera peruana (650 colaboradores) y checklist interactivo de remediación CAP.',
+        notes: [
+          'Contextualizar el caso: entidad financiera peruana supervisada por la SBS con 650 colaboradores, 18 agencias, Core on-premise y Banca Móvil en la nube.',
+          'Explicar que la opinión inicial fue "Con Salvedades" por 5 hallazgos clave (2 críticos, 2 altos, 1 medio) derivados de fallas de gobernanza básica.',
+          'Interactuar en vivo marcando los checkboxes del Plan de Acción Correctiva (CAP) para mostrar cómo sube el porcentaje de remediación y cambia el estado de riesgo residual.'
+        ]
+      },
+      {
+        num: '12',
+        speakerId: 6,
+        isBlockStart: false,
+        isBlockEnd: true,
+        title: 'Continuidad (SOC/BCP), Tendencias Futuras y Conclusiones',
+        subtitle: 'Ciberresiliencia operativa, evolución hacia auditoría continua y conclusiones finales del Equipo N.º 03.',
+        notes: [
+          'En Continuidad, destacar la transición de prevención absoluta a ciberresiliencia: métricas MTTD/MTTR del SOC, pruebas reales de RTO/RPO y respaldos inmutables.',
+          'En Tendencias, resaltar la Auditoría Continua, Compliance-as-Code, seguridad de sistemas de IA (Prompt Injection / Shadow AI), SBOM y preparación poscuántica.',
+          'Cambiar a la pestaña de Conclusiones para sintetizar los 4 aprendizajes centrales y cerrar agradeciendo al docente y compañeros en nombre de los 6 integrantes.'
+        ]
+      }
+    ];
+
+    /* -------------------------------------------------------------------------
+       3. LAS 21 REFERENCIAS BIBLIOGRÁFICAS COMPLETAS (APA 7.ª EDICIÓN)
+       ------------------------------------------------------------------------- */
+    const SOURCES_APA = [
+      'Center for Internet Security. (2024). <em>CIS Critical Security Controls</em> (Version 8.1). Center for Internet Security.',
+      'Cloud Security Alliance. (2021). <em>Cloud Controls Matrix (CCM) v4.0</em>. Cloud Security Alliance.',
+      'Congreso de la República del Perú. (2011). <em>Ley N.º 29733, Ley de Protección de Datos Personales</em>. Diario Oficial El Peruano.',
+      'International Organization for Standardization. (2018). <em>Guidelines for auditing management systems</em> (ISO Standard No. 19011:2018). ISO.',
+      'International Organization for Standardization &amp; International Electrotechnical Commission. (2020). <em>Information security, cybersecurity and privacy protection — Guidelines for information security management systems auditing</em> (ISO/IEC Standard No. 27007:2020). ISO/IEC.',
+      'International Organization for Standardization &amp; International Electrotechnical Commission. (2022a). <em>Information security, cybersecurity and privacy protection — Information security management systems — Requirements</em> (ISO/IEC Standard No. 27001:2022). ISO/IEC.',
+      'International Organization for Standardization &amp; International Electrotechnical Commission. (2022b). <em>Information security, cybersecurity and privacy protection — Information security controls</em> (ISO/IEC Standard No. 27002:2022). ISO/IEC.',
+      'ISACA. (2018). <em>COBIT 2019 framework: Governance and management objectives</em>. ISACA.',
+      'ISACA. (2020). <em>IT audit framework (ITAF): A professional practices framework for IT audit</em> (4th ed.). ISACA.',
+      'ISACA. (2023). <em>CISA review manual</em> (28th ed.). ISACA.',
+      'National Institute of Standards and Technology. (2020). <em>Security and privacy controls for information systems and organizations</em> (NIST Special Publication 800-53, Rev. 5). U.S. Department of Commerce.',
+      'National Institute of Standards and Technology. (2024). <em>The NIST Cybersecurity Framework (CSF) 2.0</em> (NIST CSWP 29). U.S. Department of Commerce.',
+      'Open Worldwide Application Security Project. (2021). <em>OWASP Top 10:2021 — The ten most critical web application security risks</em>. OWASP Foundation.',
+      'Payment Card Industry Security Standards Council. (2024). <em>Payment Card Industry Data Security Standard (PCI DSS): Requirements and testing procedures</em> (Version 4.0.1). PCI SSC.',
+      'Peltier, T. R. (2016). <em>Information security policies, procedures, and standards: Guidelines for effective information security management</em>. Auerbach Publications.',
+      'Piattini, M., &amp; Del Peso, E. (2008). <em>Auditoría de tecnologías y sistemas de información</em>. RA-MA Editorial.',
+      'Presidencia del Consejo de Ministros. (2018). <em>Decreto Legislativo N.º 1412, que aprueba la Ley de Gobierno Digital</em>. Diario Oficial El Peruano.',
+      'Rose, S., Borchert, O., Mitchell, S., &amp; Connelly, S. (2020). <em>Zero Trust Architecture</em> (NIST Special Publication 800-207). National Institute of Standards and Technology.',
+      'Stallings, W., &amp; Brown, L. (2018). <em>Computer security: Principles and practice</em> (4th ed.). Pearson.',
+      'Superintendencia de Banca, Seguros y AFP. (2021). <em>Resolución SBS N.º 504-2021, Reglamento para la Gestión de la Seguridad de la Información y la Ciberseguridad</em>. Diario Oficial El Peruano.',
+      'Whitman, M. E., &amp; Mattord, H. J. (2022). <em>Principles of information security</em> (7th ed.). Cengage Learning.'
+    ];
+
+    /* -------------------------------------------------------------------------
+       4. ESTADO INTERACTIVO DE LA PRESENTACIÓN Y COMPONENTES POR SLIDE
+       ------------------------------------------------------------------------- */
+    const state = {
+      currentSlide: 0,
+      // Slide 02
+      s2Pillar: 'confidencialidad',
+      s2EvalTab: 'auditoria',
+      // Slide 03
+      s3Tab: 'iso',
+      // Slide 04
+      s4Law: 'ley29733',
+      // Slide 05
+      s5Phase: 0,
+      s5Evidence: 'suficiente',
+      // Slide 06
+      s6Element: 'criterio',
+      s6Severity: 'critico',
+      s6Opinion: 'salvedades',
+      // Slide 07
+      s7Tab: 'fisica',
+      // Slide 08
+      s8Card: 0,
+      // Slide 09
+      s9Stage: 0,
+      // Slide 10
+      s10Model: 'iaas',
+      // Slide 11 (Checklist persistente en memoria durante la exposición)
+      s11Checks: {
+        'H-01': false,
+        'H-02': false,
+        'H-03': false,
+        'H-04': false,
+        'H-05': false
+      },
+      // Slide 12
+      s12Tab: 'continuidad'
+    };
+
+    /* -------------------------------------------------------------------------
+       5. CATÁLOGOS DE DATOS INTERACTIVOS PARA LAS 12 SLIDES
+       ------------------------------------------------------------------------- */
+    const S2_PILLARS = {
+      confidencialidad: {
+        tag: 'TRÍADA CIA · PILAR 01',
+        title: 'Confidencialidad',
+        def: 'Garantiza que la información no sea divulgada ni accesible a personas, entidades o procesos no autorizados.',
+        audit: 'Se auditan matrices de privilegios, cifrado en tránsito (TLS) y en reposo (AES-256), controles DLP, privacidad de buckets cloud y restricciones físicas.',
+        example: 'Riesgo típico: base de datos de clientes expuesta sin autenticación o empleados accediendo a nóminas sin autorización.'
+      },
+      integridad: {
+        tag: 'TRÍADA CIA · PILAR 02',
+        title: 'Integridad',
+        def: 'Asegura la exactitud, completitud y consistencia de los datos y procesos frente a alteraciones no autorizadas o accidentales.',
+        audit: 'Se verifican funciones hash criptográficas, firmas digitales, segregación de funciones (SoD), control de cambios en código y registros inmutables.',
+        example: 'Riesgo típico: alteración no autorizada de saldos contables o despliegue de código sin revisión por pares.'
+      },
+      disponibilidad: {
+        tag: 'TRÍADA CIA · PILAR 03',
+        title: 'Disponibilidad',
+        def: 'Asegura acceso confiable y oportuno a la información y sistemas críticos cuando el negocio y usuarios autorizados lo requieran.',
+        audit: 'Se evalúan arquitecturas de alta disponibilidad, mitigación DDoS, backups probados con restauración real y planes BCP/DRP (RTO/RPO).',
+        example: 'Riesgo típico: ataque ransomware que paraliza servidores productivos sin copias de respaldo verificadas ni aisladas.'
+      },
+      autenticidad: {
+        tag: 'AMPLIADO · PROPIEDAD 04',
+        title: 'Autenticidad',
+        def: 'Certeza verificable de que un usuario, dispositivo, mensaje o transacción es genuinamente quien o lo que afirma ser.',
+        audit: 'Se inspeccionan mecanismos de autenticación robusta (MFA), certificados digitales PKI válidos y ciclo de vida formal de identidades.',
+        example: 'Control clave: MFA resistente a phishing y validación criptográfica de identidades en operaciones digitales.'
+      },
+      norepudio: {
+        tag: 'AMPLIADO · PROPIEDAD 05',
+        title: 'No Repudio',
+        def: 'Impide que el emisor o receptor de una comunicación o transacción niegue posteriormente haber participado en ella.',
+        audit: 'Se revisa el uso de firmas digitales respaldadas por autoridades certificadoras confiables y sellos de tiempo criptográficos (timestamps).',
+        example: 'Aplicación crítica: aprobación electrónica de transferencias bancarias y expedientes en gobierno digital.'
+      },
+      trazabilidad: {
+        tag: 'AMPLIADO · PROPIEDAD 06',
+        title: 'Trazabilidad',
+        def: 'Vincula inequívocamente cada acción relevante sobre un sistema con un usuario individual, fecha, hora sincronizada y origen.',
+        audit: 'Se audita la prohibición de cuentas genéricas, sincronización horaria NTP y retención centralizada e inmutable de logs en SIEM.',
+        example: 'Valor forense: permite reconstruir la línea de tiempo completa ante un fraude interno o intrusión externa.'
+      }
+    };
+
+    const S2_EVAL_TABS = {
+      auditoria: {
+        name: 'Auditoría de Seguridad',
+        badge: 'VISIÓN HOLÍSTICA Y NORMATIVA',
+        objetivo: 'Verificar cumplimiento normativo y eficacia integral de controles técnicos, administrativos y físicos.',
+        alcance: 'Gobierno, políticas, procesos, personas, infraestructura, aplicaciones y terceros.',
+        intrusividad: 'Bajo o nulo; prioriza evidencia objetiva sin alterar entornos productivos.',
+        criterio: 'ISO/IEC 27001, COBIT 2019, NIST CSF 2.0, PCI-DSS, Ley N.º 29733 y Res. SBS 504-2021.',
+        entregable: 'Informe de auditoría con dictamen formal, hallazgos estructurados y plan CAP.'
+      },
+      vulnerabilidades: {
+        name: 'Evaluación de Vulnerabilidades',
+        badge: 'DESCUBRIMIENTO TÉCNICO AMPLIO',
+        objetivo: 'Identificar, catalogar y priorizar debilidades técnicas conocidas en toda la superficie de ataque.',
+        alcance: 'Redes, servidores, estaciones de trabajo, bases de datos y aplicaciones.',
+        intrusividad: 'Bajo a moderado; escaneos automatizados sin explotación activa.',
+        criterio: 'Bases CVE/NVD, puntuaciones CVSS v3.1/v4.0 y CIS Benchmarks.',
+        entregable: 'Reporte priorizado de vulnerabilidades con severidad CVSS y parches sugeridos.'
+      },
+      pentesting: {
+        name: 'Prueba de Penetración (Pentesting)',
+        badge: 'SIMULACIÓN OFENSIVA CONTROLADA',
+        objetivo: 'Simular ataques reales para explotar fallas activamente y medir el impacto práctico de intrusión.',
+        alcance: 'Objetivos focalizados: perímetro externo, aplicación web/API, red interna o ingeniería social.',
+        intrusividad: 'Moderado a alto; requiere reglas de enfrentamiento (RoE) estrictas para evitar caídas.',
+        criterio: 'Metodologías ofensivas PTES, OWASP WSTG, MITRE ATT&CK y OSSTMM.',
+        entregable: 'Reporte ejecutivo y técnico con pruebas de concepto (PoC), rutas de ataque y mitigaciones.'
+      }
+    };
+
+    const S3_STANDARDS = {
+      iso: {
+        title: 'ISO/IEC 27001:2022 & 27002:2022',
+        subtitle: 'Estándar certificable de SGSI, catálogo moderno de controles y directrices ISO 19011 / 27007',
+        metrics: [
+          { label: 'Controles Anexo A', value: '93', sub: 'Consolidados desde 114' },
+          { label: 'Controles Nuevos', value: '11', sub: 'Cloud, TI, DLP, Coding' },
+          { label: 'Cláusulas SGSI', value: '4 – 10', sub: 'Esquema Armonizado' },
+          { label: 'Artefacto Clave', value: 'SoA', sub: 'Declaración Aplicabilidad' }
+        ],
+        blocks: [
+          { name: '37 Organizacionales', desc: 'Políticas, roles, inteligencia de amenazas, seguridad en servicios cloud y continuidad TIC.' },
+          { name: '8 de Personas', desc: 'Selección previa, acuerdos de confidencialidad, concientización y trabajo remoto.' },
+          { name: '14 Físicos', desc: 'Perímetros físicos, monitoreo de seguridad física, suministros y protección de equipos.' },
+          { name: '34 Tecnológicos', desc: 'Gestión de configuración, borrado, enmascaramiento, DLP, filtrado web y codificación segura.' }
+        ],
+        footerNote: 'Praxis auditora: ISO 19011:2018 (7 principios de auditoría) e ISO/IEC 27007:2020 (guía específica para auditar SGSI y ciclo PHVA).'
+      },
+      nist: {
+        title: 'NIST CSF 2.0 & NIST SP 800-53 Rev. 5',
+        subtitle: 'Marco de ciberseguridad con nueva gobernanza estratégica y catálogo técnico exhaustivo',
+        metrics: [
+          { label: 'Funciones CSF 2.0', value: '6', sub: 'Nueva: Gobernar (2024)' },
+          { label: 'Implementation Tiers', value: '1 – 4', sub: 'Niveles de madurez' },
+          { label: 'Familias SP 800-53', value: '20', sub: 'AC, AU, CM, IR, SR...' },
+          { label: 'Perfiles', value: 'AS-IS/TO-BE', sub: 'Brechas en lenguaje CEO' }
+        ],
+        blocks: [
+          { name: '1. Gobernar (Govern)', desc: 'Función transversal incorporada en 2024: estrategia, apetito de riesgo, roles y cadena de suministro.' },
+          { name: '2. Identificar y 3. Proteger', desc: 'Gestión de activos, riesgos, identidades (IAM), capacitación y protección de datos e infraestructura.' },
+          { name: '4. Detectar y 5. Responder', desc: 'Monitoreo continuo de anomalías, análisis de incidentes, contención y comunicación oportuna.' },
+          { name: '6. Recuperar + SP 800-53', desc: 'Restauración resiliente de operaciones y procedimientos técnicos verificables en 20 familias de control.' }
+        ],
+        footerNote: 'Referencia dual: NIST CSF 2.0 comunica postura ejecutiva al directorio; NIST SP 800-53 Rev. 5 indica exactamente qué examinar, entrevistar y probar.'
+      },
+      cobit: {
+        title: 'COBIT 2019 & CIS Controls v8.1',
+        subtitle: 'Puente entre gobierno corporativo de TI y ciberhigiene técnica priorizada',
+        metrics: [
+          { label: 'Objetivos Seguridad', value: 'APO13/DSS05', sub: 'Pilares COBIT 2019' },
+          { label: 'Capacidad CMMI', value: '0 – 5', sub: 'Escala de madurez' },
+          { label: 'Controles CIS v8.1', value: '18', sub: '153 salvaguardas' },
+          { label: 'Grupos CIS', value: 'IG1 – IG3', sub: 'Priorización por riesgo' }
+        ],
+        blocks: [
+          { name: 'COBIT APO13 (Gestionar Seguridad)', desc: 'Define, opera y monitorea el SGSI alineando los controles de seguridad con las metas corporativas.' },
+          { name: 'COBIT DSS05 (Servicios de Seguridad)', desc: 'Controles operativos contra malware, seguridad de red, endpoints, identidades y monitoreo de eventos.' },
+          { name: 'CIS IG1 (Ciberhigiene Esencial)', desc: 'Línea base auditable incluso para PyMEs: inventario de activos, backups, parches y accesos.' },
+          { name: 'CIS IG2 e IG3 (Madurez Avanzada)', desc: 'Controles progresivos para empresas medianas y entornos de alta criticidad o regulación.' }
+        ],
+        footerNote: 'Sinergia práctica: COBIT 2019 gobierna el valor y mide madurez; CIS Controls v8.1 aporta acciones técnicas rápidas de alto impacto.'
+      },
+      pci: {
+        title: 'PCI-DSS v4.0.1 & OWASP Top 10 / ASVS',
+        subtitle: 'Cumplimiento estricto en medios de pago y verificación de seguridad en aplicaciones web y APIs',
+        metrics: [
+          { label: 'Requisitos PCI-DSS', value: '12', sub: '6 objetivos de control' },
+          { label: 'Evaluadores PCI', value: 'QSA / ASV', sub: 'Auditoría + Escaneo trim.' },
+          { label: 'OWASP Top 10', value: '2021', sub: 'Riesgos críticos web' },
+          { label: 'OWASP ASVS', value: '3 Niveles', sub: 'Verificación de código' }
+        ],
+        blocks: [
+          { name: 'PCI-DSS v4.0.1 (Medios de Pago)', desc: 'Obligatorio al almacenar, procesar o transmitir tarjetas. Exige MFA ampliado en CDE y control contra scripts en páginas de pago.' },
+          { name: 'A01: Broken Access Control', desc: 'Principal riesgo OWASP Top 10: fallas de autorización que permiten escalar privilegios o acceder a datos ajenos.' },
+          { name: 'A02 y A03: Criptografía e Inyección', desc: 'Protección contra exposición de datos sensibles y ataques de inyección SQL, comandos o LDAP.' },
+          { name: 'ASVS, WSTG y API Top 10', desc: 'Estándares abiertos de OWASP que permiten auditorías repetibles en código fuente, pruebas dinámicas y APIs.' }
+        ],
+        footerNote: 'Complemento técnico: OSSTMM y PTES complementan a OWASP cuando la auditoría incluye validación perimetral o pruebas técnicas estructuradas.'
+      }
+    };
+
+    const S4_LAWS = {
+      ley29733: {
+        code: 'LEY N.º 29733',
+        title: 'Ley de Protección de Datos Personales',
+        entity: 'Congreso de la República · Fiscaliza: ANPD (MINJUSDH)',
+        scope: 'Toda organización pública o privada en el Perú que trate datos de clientes, trabajadores, ciudadanos o proveedores.',
+        obligations: [
+          'Inscripción vigente de bancos de datos personales en el Registro Nacional de Protección de Datos.',
+          'Obtención de consentimiento libre, previo, expreso, inequívoco e informado del titular.',
+          'Procedimientos documentados y oportunos para atender derechos ARCO (Acceso, Rectificación, Cancelación y Oposición).',
+          'Gestión formal de privilegios, registros de acceso lógico y backups según categoría del banco (básico, intermedio o complejo).',
+          'Comunicación obligatoria de flujos transfronterizos de datos (ej. servidores o servicios cloud en el exterior).'
+        ],
+        impact: 'Exposición a fiscalizaciones de la ANPD y multas administrativas severas calculadas en UIT, además de daño reputacional.'
+      },
+      dl1412: {
+        code: 'D.L. N.º 1412',
+        title: 'Ley de Gobierno Digital y Seguridad Digital del Estado',
+        entity: 'Presidencia del Consejo de Ministros · Rector: SGTD',
+        scope: 'Ministerios, gobiernos regionales, municipalidades, universidades públicas y entidades de la administración estatal.',
+        obligations: [
+          'Designación formal de un Oficial de Seguridad y Confianza Digital dentro de la entidad pública.',
+          'Implementación obligatoria de un Sistema de Gestión de Seguridad de la Información alineado a NTP-ISO/IEC 27001.',
+          'Gestión estructurada y reporte obligatorio de incidentes al Centro Nacional de Seguridad Digital (CNSD).',
+          'Alineamiento al Marco de Seguridad Digital del Estado Peruano y evaluaciones periódicas de cumplimiento.',
+          'Resguardo de la confianza digital en servicios ciudadanos, identidad digital e interoperabilidad estatal.'
+        ],
+        impact: 'Responsabilidad administrativa funcional, observaciones de Contraloría y vulneración de servicios públicos esenciales.'
+      },
+      sbs504: {
+        code: 'RES. SBS N.º 504-2021',
+        title: 'Reglamento para la Gestión de la Seguridad de la Información y la Ciberseguridad',
+        entity: 'Superintendencia de Banca, Seguros y AFP (SBS)',
+        scope: 'Bancos, empresas financieras, cajas municipales y rurales, aseguradoras y AFP supervisadas en el Perú.',
+        obligations: [
+          'Gobernanza formal del riesgo de ciberseguridad con supervisión directa a nivel de Directorio.',
+          'Programas de autenticación reforzada (MFA) obligatorios para operaciones y canales digitales.',
+          'Pruebas periódicas de vulnerabilidades y hacking ético ejecutadas por terceros independientes.',
+          'Notificación obligatoria y oportuna de incidentes significativos de ciberseguridad ante la SBS.',
+          'Gestión rigurosa de riesgos en proveedores cloud y evaluación anual obligatoria por Auditoría Interna.'
+        ],
+        impact: 'Sanciones regulatorias de la SBS, restricciones operativas en canales digitales y exigencia de planes de adecuación inmediatos.'
+      }
+    };
+
+    const S5_PHASES = [
+      {
+        step: '01',
+        name: 'Planificación y Alcance',
+        tag: 'ENFOQUE BASADO EN RIESGOS',
+        desc: 'Cimiento metodológico para concentrar esfuerzo auditor en activos de mayor exposición inherente y de control.',
+        bullets: [
+          'Comprensión del negocio, arquitectura tecnológica, entorno regulatorio e historial de incidentes.',
+          'Inventario y clasificación de activos dentro del universo auditable (core, BD, nube, terceros).',
+          'Carta de Compromiso (Audit Charter) aprobada por el Comité: autoridad, alcance, exclusiones y confidencialidad.',
+          'Selección de criterios objetivos, Programa de Auditoría y lista inicial de requerimientos (PBC).'
+        ]
+      },
+      {
+        step: '02',
+        name: 'Ejecución y Evidencia',
+        tag: 'TRABAJO DE CAMPO Y CAATs',
+        desc: 'Aplicación de pruebas de control combinando técnicas manuales y automatizadas sobre poblaciones reales.',
+        bullets: [
+          'Pruebas de Diseño (Walkthroughs): ¿El control concebido es capaz de mitigar el riesgo?',
+          'Pruebas de Eficacia Operativa: ¿Funcionó consistentemente durante los últimos 12 meses?',
+          'Triangulación: revisión documental, entrevistas, observación directa, reejecución y muestreo.',
+          'Uso intensivo de CAATs: scripts Python/ACL para cruzar 100 % de bajas RR. HH. vs. AD, Nessus y OpenSCAP.'
+        ]
+      },
+      {
+        step: '03',
+        name: 'Evaluación y Papeles de Trabajo',
+        tag: 'ANÁLISIS Y RESGUARDO',
+        desc: 'Consolidación de evidencia probatoria, estructuración de brechas y priorización del riesgo residual.',
+        bullets: [
+          'Organización de Papeles de Trabajo claros y reproducibles por cualquier otro auditor experimentado.',
+          'Protección estricta de papeles de trabajo mediante cifrado y control de acceso restringido.',
+          'Redacción objetiva de hallazgos (Criterio, Condición, Causa, Efecto y Recomendación).',
+          'Clasificación de criticidad articulando impacto corporativo y métrica técnica CVSS.'
+        ]
+      },
+      {
+        step: '04',
+        name: 'Informe y Seguimiento (CAP)',
+        tag: 'DICTAMEN Y REMEDIACIÓN',
+        desc: 'Comunicación ejecutiva/técnica de resultados y validación independiente del cierre real de brechas.',
+        bullets: [
+          'Reunión de cierre para validar exactitud fáctica y recabar compromisos de la gerencia.',
+          'Emisión de Informe Ejecutivo (Directorio/Comité) e Informe Técnico Detallado (CISO/TI).',
+          'Formalización del Plan de Acción Correctiva (CAP) con propietario único y plazo, o Carta de Aceptación del Riesgo.',
+          'Auditoría de Seguimiento (Follow-up): exige nueva evidencia objetiva para cerrar formalmente el hallazgo.'
+        ]
+      }
+    ];
+
+    const S5_EVIDENCE = {
+      suficiente: {
+        title: 'Suficiente',
+        desc: 'Cantidad adecuada de evidencia objetiva y persuasiva para sustentar una conclusión razonable y defendible.',
+        check: 'Ejemplo: muestra estadísticamente válida de altas/bajas del año o análisis al 100 % mediante CAATs.'
+      },
+      competente: {
+        title: 'Competente (Válida)',
+        desc: 'Calidad intrínseca y credibilidad según su fuente; la evidencia obtenida directamente del sistema supera declaraciones verbales.',
+        check: 'Ejemplo: exportación directa de políticas IAM o reglas de firewall frente a un correo confirmando cumplimiento.'
+      },
+      relevante: {
+        title: 'Relevante',
+        desc: 'Conexión lógica directa entre la evidencia recolectada y el objetivo específico de control que se evalúa.',
+        check: 'Ejemplo: una política firmada prueba diseño documental, pero no prueba eficacia operativa sin logs reales.'
+      },
+      fiable: {
+        title: 'Fiable',
+        desc: 'Certeza de que los datos extraídos no fueron manipulados y provienen de entornos productivos auténticos.',
+        check: 'Ejemplo: capturas con fecha/hora visible, comandos ejecutados registrados y verificación con sumas hash.'
+      }
+    };
+
+    const S6_ELEMENTS = {
+      criterio: {
+        title: '1. Criterio ("Lo que debería ser")',
+        desc: 'Política interna, estándar internacional (ISO 27001, PCI-DSS), norma técnica o requisito legal (SBS 504-2021, Ley 29733) usado como parámetro objetivo.',
+        sample: 'Ej.: "La política IAM y Res. SBS 504-2021 exigen revocar accesos de personal cesado en un máximo de 24 horas."'
+      },
+      condicion: {
+        title: '2. Condición ("Lo que realmente es")',
+        desc: 'Descripción objetiva, fáctica y cuantificada de la deficiencia identificada durante el trabajo de campo, respaldada por evidencia verificable.',
+        sample: 'Ej.: "Del cruce de 84 bajas anuales contra Active Directory, 11 cuentas seguían activas (3 por más de 45 días)."'
+      },
+      causa: {
+        title: '3. Causa ("Por qué ocurrió")',
+        desc: 'Factor subyacente o causa raíz que originó la brecha. Corregir solo el síntoma sin atacar la causa garantiza que el problema reaparezca.',
+        sample: 'Ej.: "Proceso de bajas manual por correo sin integración automática entre RR. HH. y el directorio corporativo."'
+      },
+      efecto: {
+        title: '4. Efecto o Riesgo ("Cuál es el impacto")',
+        desc: 'Consecuencias reales o potenciales para la organización si la debilidad persiste: fraude, interrupción operativa, multas o daño reputacional.',
+        sample: 'Ej.: "Exposición a acceso no autorizado a datos financieros, fraude interno y sanciones regulatorias."'
+      },
+      recomendacion: {
+        title: '5. Recomendación (Acción correctiva)',
+        desc: 'Medida concreta, viable y proporcional al riesgo orientada a eliminar la causa raíz y restablecer la eficacia del control.',
+        sample: 'Ej.: "Revocar cuentas huérfanas en 15 días, integrar RR. HH. con IAM en 60 días e instaurar recertificación trimestral."'
+      }
+    };
+
+    const S6_SEVERITIES = {
+      critico: {
+        label: 'Crítico',
+        cvss: '9.0 – 10.0',
+        window: '24 horas a 15 días',
+        color: '#ef4444',
+        desc: 'Ausencia total o fallo grave de un control esencial fácilmente explotable sin controles compensatorios.',
+        impact: 'Compromiso masivo de datos confidenciales, paralización total operativa, sanciones legales graves o pérdida severa.'
+      },
+      alto: {
+        label: 'Alto',
+        cvss: '7.0 – 8.9',
+        window: '15 a 30 días',
+        color: '#f97316',
+        desc: 'Debilidad sustancial en el diseño u operación de un control clave que expone activos críticos a riesgo elevado.',
+        impact: 'Interrupción parcial de servicios críticos, acceso no autorizado a sistemas sensibles o incumplimiento sancionable.'
+      },
+      medio: {
+        label: 'Medio',
+        cvss: '4.0 – 6.9',
+        window: '30 a 90 días',
+        color: '#eab308',
+        desc: 'Deficiencia moderada en la ejecución consistente de un control o existencia de controles compensatorios parciales.',
+        impact: 'Degradación localizada de servicios, ineficiencias operativas o exposición acotada con baja probabilidad masiva.'
+      },
+      bajo: {
+        label: 'Bajo',
+        cvss: '0.1 – 3.9',
+        window: '90 a 180 días',
+        color: '#38bdf8',
+        desc: 'Desviación menor de buenas prácticas o debilidad documental con impacto residual limitado.',
+        impact: 'Impacto operativo o reputacional mínimo; oportunidades de optimización y madurez del sistema de control.'
+      }
+    };
+
+    const S6_OPINIONS = {
+      favorable: {
+        title: 'Favorable / Limpia',
+        short: 'Sin salvedades',
+        color: '#10b981',
+        desc: 'Los controles evaluados están adecuadamente diseñados y operan eficazmente en todos los aspectos materiales.'
+      },
+      salvedades: {
+        title: 'Con Salvedades',
+        short: 'Brechas puntuales',
+        color: '#f59e0b',
+        desc: 'Existen deficiencias puntuales materiales que requieren remediación prioritaria, pero el entorno general sigue siendo aceptable.'
+      },
+      adverso: {
+        title: 'Adverso / Desfavorable',
+        short: 'Fallas sistémicas',
+        color: '#ef4444',
+        desc: 'Se constatan debilidades generalizadas y críticas en controles esenciales que exponen gravemente a la organización.'
+      },
+      abstencion: {
+        title: 'Abstención de Opinión',
+        short: 'Limitación severa',
+        color: '#94a3b8',
+        desc: 'Restricciones graves al alcance o falta de acceso a evidencia impiden al auditor formar un juicio técnico fundado.'
+      }
+    };
+
+    const S7_TABS = {
+      fisica: {
+        title: 'Seguridad Física y Ambiental',
+        ref: 'ISO/IEC 27002:2022 · Controles Físicos (14)',
+        lead: 'Ninguna ciberseguridad lógica resiste si un tercero accede físicamente a servidores, switches o medios de respaldo.',
+        items: [
+          { name: 'Accesos Físicos y Perímetro', desc: 'Tarjetas RFID, autenticación biométrica, esclusas anticolado y bitácoras verificables de visitantes y proveedores.' },
+          { name: 'Monitoreo y Segregación', desc: 'Cobertura y retención adecuada de CCTV, más aislamiento físico de cuartos de telecomunicaciones y data center.' },
+          { name: 'Continuidad Eléctrica y Clima', desc: 'Climatización de precisión, sensores de temperatura/humedad, pisos elevados, UPS y grupos electrógenos probados bajo carga.' },
+          { name: 'Supresión de Incendios', desc: 'Detección temprana y sistemas automáticos con agentes limpios (sin agua) que protegen el equipamiento electrónico.' }
+        ],
+        evidence: 'Evidencia clave: logs de ingreso al data center, actas de mantenimiento de UPS, pruebas reales de generador e inspección in situ.'
+      },
+      redes: {
+        title: 'Seguridad de Redes y Perímetro',
+        ref: 'Defensa en Profundidad · Topología Real vs. Documentada',
+        lead: 'Comprueba aislamiento lógico entre zonas de confianza, reglas restrictivas y ausencia de dispositivos no autorizados.',
+        items: [
+          { name: 'Segmentación VLAN y DMZ', desc: 'Separación estricta entre usuarios corporativos, DMZ pública, red administrativa fuera de banda, IoT y bases de datos críticas.' },
+          { name: 'Firewalls de Próxima Generación', desc: 'Principio de denegación por defecto; detección de reglas permisivas (Any/Any), reglas obsoletas y falta de revisión periódica.' },
+          { name: 'Detección y Redes Inalámbricas', desc: 'Operación efectiva de IDS/IPS, cifrado WPA3-Enterprise / WPA2-Enterprise (802.1X) y aislamiento total de Wi-Fi de invitados.' },
+          { name: 'Accesos Remotos Seguros', desc: 'Túneles VPN con cifrado robusto, certificados vigentes y bloqueo de túneles divididos (split tunneling) inseguros.' }
+        ],
+        evidence: 'Evidencia clave: exportación de reglas de firewall, diagramas vigentes de red, trazas Nmap/Wireshark y registros de conexión VPN.'
+      },
+      zerotrust: {
+        title: 'Arquitectura Zero Trust (NIST SP 800-207)',
+        ref: 'Rose et al. (2020) · "Nunca confiar, siempre verificar"',
+        lead: 'Abandona la confianza implícita por ubicación de red ante el trabajo híbrido y la nube, exigiendo validación continua por sesión.',
+        items: [
+          { name: 'Verificación Explícita Continua', desc: 'Cada solicitud de acceso autentica y autoriza identidad, dispositivo y contexto en tiempo real antes de conectar.' },
+          { name: 'Microsegmentación Granular', desc: 'Limita el movimiento lateral dividiendo cargas de trabajo en zonas mínimas con políticas por aplicación o servicio.' },
+          { name: 'Postura del Endpoint', desc: 'Valida salud del dispositivo (parches, cifrado de disco, agente EDR activo) como requisito previo al acceso.' },
+          { name: 'Arquitectura PDP / PEP', desc: 'Audita la separación y eficacia del Punto de Decisión de Políticas (PDP) y el Punto de Aplicación (PEP).' }
+        ],
+        evidence: 'Evidencia clave: políticas de acceso condicional, reportes de cumplimiento de dispositivos y logs de decisiones PDP/PEP.'
+      }
+    };
+
+    const S8_CARDS = [
+      {
+        title: 'Mínimo Privilegio & SoD',
+        tag: 'PRINCIPIOS IAM',
+        control: 'Asignación estricta de permisos mínimos necesarios y separación de funciones incompatibles (ej. desarrollador sin acceso de despliegue en producción).',
+        risk: 'Fraude interno, cambios no autorizados en producción o alteración de pistas de auditoría.',
+        test: 'Matriz de conflictos SoD y cruce de roles de desarrollo vs. operadores de producción y DBA.'
+      },
+      {
+        title: 'Bajas RR. HH. vs. Active Directory',
+        tag: 'CICLO DE VIDA',
+        control: 'Revocación oportuna de cuentas ante cese laboral, modificación por cambio de puesto y recertificación periódica de accesos.',
+        risk: 'Cuentas huérfanas activas susceptibles de uso indebido por excolaboradores o atacantes externos.',
+        test: 'CAAT en Python/PowerShell cruzando el 100 % de la planilla de ceses anuales contra cuentas activas en AD / Entra ID.'
+      },
+      {
+        title: 'MFA Resistente a Phishing',
+        tag: 'AUTENTICACIÓN',
+        control: 'Autenticación multifactor obligatoria (FIDO2/WebAuthn o apps corporativas) en VPN, correo, nube, apps críticas y cuentas administrativas.',
+        risk: 'Compromiso total de infraestructura por robo de contraseñas, credential stuffing o phishing.',
+        test: 'Reporte global de estado de registro MFA en Entra ID/Okta y verificación de cero excepciones informales.'
+      },
+      {
+        title: 'Bóvedas PAM & Just-in-Time',
+        tag: 'ACCESO PRIVILEGIADO',
+        control: 'Gestión de cuentas Domain Admin, root y DBA mediante bóvedas PAM con rotación automática de claves, acceso temporal y grabación de sesiones.',
+        risk: 'Escalamiento silencioso de privilegios y pérdida de trazabilidad sobre acciones administrativas críticas.',
+        test: 'Revisión de bóveda PAM, alertas de uso directo de cuentas privilegiadas fuera de bóveda y muestra de grabaciones.'
+      },
+      {
+        title: 'Hardening (CIS) & Parches',
+        tag: 'PLATAFORMAS BASE',
+        control: 'Eliminación de servicios/puertos y protocolos heredados (SMBv1, Telnet, TLS antiguo), parches por SLA y plan para sistemas End-of-Life.',
+        risk: 'Explotación masiva de vulnerabilidades conocidas (CVE) y movimiento lateral rápido en la red.',
+        test: 'Escaneos autenticados (Nessus/Qualys) y validación automatizada con OpenSCAP contra CIS Benchmarks.'
+      },
+      {
+        title: 'Centralización de Logs, SIEM & NTP',
+        tag: 'TRAZABILIDAD',
+        control: 'Captura de eventos críticos (logins, escalamientos, cambios), sincronización horaria NTP, envío en tiempo real a SIEM inmutable y retención legal.',
+        risk: 'Ceguera ante intrusiones activas e imposibilidad de reconstruir cronológicamente un incidente forense.',
+        test: 'Verificación de fuentes activas en SIEM, chequeo de desfase horario NTP y pruebas de protección contra borrado de logs.'
+      }
+    ];
+
+    const S9_STAGES = [
+      {
+        step: '01',
+        name: 'Diseño Seguro',
+        subtitle: 'Arquitectura & Modelado de Amenazas',
+        checks: [
+          'Definición formal de requisitos de seguridad desde la especificación funcional.',
+          'Ejecución documentada de modelado de amenazas (STRIDE) antes de codificar.',
+          'Separación física o lógica estricta entre ambientes de Desarrollo, Pruebas (QA) y Producción.'
+        ],
+        tools: ['Threat Modeling (STRIDE)', 'OWASP ASVS', 'Revisión de Arquitectura'],
+        evidence: 'Actas de diseño seguro, diagramas de flujo de datos con fronteras de confianza y matriz de amenazas mitigadas.'
+      },
+      {
+        step: '02',
+        name: 'Código & Repositorios',
+        subtitle: 'Code Review, SAST y Detección de Secretos',
+        checks: [
+          'Revisión obligatoria por pares (Pull Request / Code Review) y ramas protegidas en Git.',
+          'Compuertas automáticas SAST (Pruebas Estáticas) integradas en CI/CD para detectar fallas en código.',
+          'Escaneo automático anti-secretos para prohibir claves, tokens o contraseñas en texto plano en el código.'
+        ],
+        tools: ['SonarQube', 'Semgrep', 'Gitleaks / TruffleHog'],
+        evidence: 'Logs de pipelines CI/CD bloqueando vulnerabilidades críticas y reglas de protección de ramas productivas.'
+      },
+      {
+        step: '03',
+        name: 'Dependencias (SCA)',
+        subtitle: 'Análisis de Composición de Software',
+        checks: [
+          'Escaneo automatizado de librerías de terceros y paquetes open source con CVEs críticos.',
+          'Validación de imágenes de contenedores base antes de su publicación en registros corporativos.',
+          'Control de versiones aprobadas y generación trazable de inventario de componentes.'
+        ],
+        tools: ['Trivy', 'OWASP Dependency-Check', 'Snyk'],
+        evidence: 'Reportes SCA por despliegue, políticas de bloqueo ante CVEs críticos y manifiestos de dependencias actualizados.'
+      },
+      {
+        step: '04',
+        name: 'Pruebas (DAST & QA)',
+        subtitle: 'OWASP Top 10 y Enmascaramiento de Datos',
+        checks: [
+          'Pruebas dinámicas (DAST) y pruebas de seguridad de APIs frente a OWASP Top 10:2021 (A01 Broken Access Control, Inyecciones, SSRF).',
+          'Verificación de enmascaramiento o anonimización total de datos productivos antes de usarlos en QA.',
+          'Aprobación formal de control de cambios antes de promover cualquier versión a producción.'
+        ],
+        tools: ['OWASP ZAP', 'Burp Suite', 'Pruebas Automatizadas API'],
+        evidence: 'Informes DAST/pentesting cerrados, muestras de BD de QA anonimizadas y tickets aprobados de pase a producción.'
+      },
+      {
+        step: '05',
+        name: 'Datos & Producción',
+        subtitle: 'Criptografía, HSM/KMS y Segregación DBA',
+        checks: [
+          'Cifrado obligatorio en tránsito (TLS 1.2 seguro / TLS 1.3) y en reposo (AES-256 en BD, discos y backups) conforme a Ley N.º 29733.',
+          'Ciclo de vida de claves gestionado en HSM o KMS con rotación periódica y custodia segregada.',
+          'Segregación entre DBA y seguridad, auditoría nativa DDL/DML y bloqueo de acceso directo desde estaciones de usuarios.'
+        ],
+        tools: ['HSM / Cloud KMS', 'TLS 1.3 & AES-256', 'Auditoría Nativa BD'],
+        evidence: 'Parámetros de cifrado TDE/TLS, políticas de rotación en KMS y logs de auditoría de tablas confidenciales.'
+      }
+    ];
+
+    const S10_LAYERS = [
+      { name: 'Datos, Clasificación y Cumplimiento Legal', iaas: 'client', paas: 'client', saas: 'client' },
+      { name: 'Identidades, Roles IAM y Accesos (MFA)', iaas: 'client', paas: 'client', saas: 'shared' },
+      { name: 'Aplicaciones, APIs y Código Seguro', iaas: 'client', paas: 'client', saas: 'provider' },
+      { name: 'Sistemas Operativos, Parches y Red Virtual', iaas: 'client', paas: 'provider', saas: 'provider' },
+      { name: 'Hipervisor, Virtualización y Plataforma Base', iaas: 'provider', paas: 'provider', saas: 'provider' },
+      { name: 'Hardware Físico, Red Física y Data Centers', iaas: 'provider', paas: 'provider', saas: 'provider' }
+    ];
+
+    const S10_MODEL_INFO = {
+      iaas: {
+        title: 'IaaS (Infraestructura como Servicio)',
+        examples: 'AWS EC2, Azure VMs, Google Compute Engine',
+        auditFocus: 'Máxima responsabilidad del cliente: el auditor revisa hardening de SO invitados, parches, firewalls/Security Groups, cifrado de volúmenes, IAM y cuentas raíz.'
+      },
+      paas: {
+        title: 'PaaS (Plataforma como Servicio)',
+        examples: 'Azure App Service, AWS RDS, Google Cloud Run',
+        auditFocus: 'El proveedor gestiona SO y parches subyacentes; el auditor enfoca pruebas en seguridad aplicativa, configuraciones de BD, cifrado KMS, red privada e identidades IAM.'
+      },
+      saas: {
+        title: 'SaaS (Software como Servicio)',
+        examples: 'Microsoft 365, Google Workspace, Salesforce',
+        auditFocus: 'El proveedor opera la app e infraestructura; el auditor valida informes SOC 2 Tipo II / ISO 27001 del proveedor y audita MFA, permisos, DLP y retención de datos del cliente.'
+      }
+    };
+
+    const S11_FINDINGS = [
+      {
+        id: 'H-01',
+        severity: 'Crítico',
+        sevColor: '#ef4444',
+        title: '11 cuentas de excolaboradores activas y violación de SoD en 4 perfiles de TI',
+        criteria: 'Res. SBS N.º 504-2021 · Ley N.º 29733 · ISO/IEC 27001 A.5.18',
+        rootCause: 'Bajas manuales vía correo sin integración RR. HH.–IAM ni recertificación semestral.',
+        action: 'Revocación inmediata (15d), automatización RR. HH.–IAM (60d) y recertificación trimestral.',
+        owner: 'Gerencia de TI y RR. HH.'
+      },
+      {
+        id: 'H-02',
+        severity: 'Crítico',
+        sevColor: '#ef4444',
+        title: 'Accesos administrativos VPN y consolas cloud sin MFA ni control PAM',
+        criteria: 'Res. SBS N.º 504-2021 · PCI-DSS v4.0.1 Req. 8 · ISO/IEC 27001 A.8.5',
+        rootCause: 'Excepciones técnicas informales para soporte nocturno sin aprobación de Riesgos.',
+        action: 'Eliminar excepciones, imponer MFA resistente a phishing (15d) e implementar PAM (90d).',
+        owner: 'CISO e Infraestructura TI'
+      },
+      {
+        id: 'H-03',
+        severity: 'Alto',
+        sevColor: '#f97316',
+        title: 'Backups cloud sin cifrado KMS, sin inmutabilidad WORM y 14 meses sin pruebas',
+        criteria: 'Res. SBS N.º 504-2021 · ISO/IEC 27001 A.8.13 y A.8.24',
+        rootCause: 'Configuración inicial por defecto en migración cloud sin validación de Seguridad.',
+        action: 'Activar AES-256 con KMS segregado, Object Lock WORM y simulacro de restauración (30d).',
+        owner: 'Operaciones TI'
+      },
+      {
+        id: 'H-04',
+        severity: 'Alto',
+        sevColor: '#f97316',
+        title: '14 vulnerabilidades críticas vencidas (>90d) en DMZ y pases sin SAST/DAST',
+        criteria: 'PCI-DSS v4.0.1 Req. 6 y 11 · OWASP Top 10 · ISO/IEC 27001 A.8.8',
+        rootCause: 'Falta de ventanas mensuales de parcheo y ausencia de compuertas de seguridad en CI/CD.',
+        action: 'Parcheo de emergencia (30d) e integración obligatoria de compuertas SAST/DAST (60d).',
+        owner: 'Desarrollo y Operaciones TI'
+      },
+      {
+        id: 'H-05',
+        severity: 'Medio',
+        sevColor: '#eab308',
+        title: 'Declaración de Aplicabilidad (SoA) en versión 2013 y 35 % de incidentes sin causa raíz',
+        criteria: 'ISO/IEC 27001:2022 cláusula 6.1.3 y A.5.27',
+        rootCause: 'Falta de actualización documental del SGSI y plantillas opcionales en incidentes menores.',
+        action: 'Migrar SGSI y SoA a versión 2022 y estandarizar análisis obligatorio post-incidente (90d).',
+        owner: 'Oficial de Seguridad (OSI)'
+      }
+    ];
+
+    /* -------------------------------------------------------------------------
+       6. UTILIDADES DE TEMA DINÁMICO Y NAVEGACIÓN
+       ------------------------------------------------------------------------- */
+    function getSpeaker(speakerId) {
+      return SPEAKERS.find(s => s.id === speakerId) || SPEAKERS[0];
+    }
+
+    function applyDynamicTheme(speaker) {
+      const root = document.documentElement;
+      root.style.setProperty('--accent', speaker.hex);
+      root.style.setProperty('--accent-rgb', speaker.rgb);
+      root.style.setProperty('--accent-soft', `rgba(${speaker.rgb}, 0.14)`);
+      root.style.setProperty('--accent-glow', `rgba(${speaker.rgb}, 0.36)`);
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toast-box');
+      if (!box) return;
+      box.textContent = msg;
+      box.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 2800);
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= SLIDES.length) return;
+      state.currentSlide = index;
+      closeAllModals();
+      renderApp();
+      const scrollWrap = document.getElementById('slide-scroll-wrapper');
+      if (scrollWrap) scrollWrap.scrollTop = 0;
+    }
+
+    function nextSlide() {
+      if (state.currentSlide < SLIDES.length - 1) goToSlide(state.currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (state.currentSlide > 0) goToSlide(state.currentSlide - 1);
+    }
+
+    /* -------------------------------------------------------------------------
+       7. RENDERIZADO DE BARRAS FIJAS, PROGRESO SEGMENTADO Y BANNER DE BLOQUE
+       ------------------------------------------------------------------------- */
+    function renderChrome() {
+      const slide = SLIDES[state.currentSlide];
+      const speaker = getSpeaker(slide.speakerId);
+      const nextSpeaker = SPEAKERS.find(s => s.id === speaker.id + 1);
+
+      applyDynamicTheme(speaker);
+
+      // Header pill
+      document.getElementById('header-block-label').textContent = speaker.shortBlock;
+      document.getElementById('header-speaker-name').textContent = speaker.name;
+
+      // Footer speaker info
+      document.getElementById('footer-avatar').textContent = speaker.initials;
+      document.getElementById('footer-block-tag').textContent = speaker.block.toUpperCase();
+      document.getElementById('footer-block-slides').textContent = `SLIDES ${speaker.slideRange}`;
+      document.getElementById('footer-speaker-name').textContent = speaker.name;
+      document.getElementById('footer-slide-short-title').textContent = slide.title;
+
+      const totalStr = String(SLIDES.length).padStart(2, '0');
+      document.getElementById('footer-counter').textContent = `${slide.num} / ${totalStr}`;
+      document.getElementById('footer-counter-mobile').textContent = `${slide.num}/${totalStr}`;
+
+      // Botones Prev / Next
+      document.getElementById('btn-prev').disabled = state.currentSlide === 0;
+      document.getElementById('btn-next').disabled = state.currentSlide === SLIDES.length - 1;
+
+      // Barra de progreso segmentada en los 6 colores de los expositores
+      const segContainer = document.getElementById('segmented-progress');
+      segContainer.innerHTML = SPEAKERS.map((sp) => {
+        const blockSlides = [sp.startIndex, sp.startIndex + 1];
+        let fillPct = 0;
+        if (state.currentSlide > blockSlides[1]) fillPct = 100;
+        else if (state.currentSlide === blockSlides[1]) fillPct = 100;
+        else if (state.currentSlide === blockSlides[0]) fillPct = 50;
+
+        const isCurrentBlock = sp.id === speaker.id;
+        return `
+          <button
+            onclick="goToSlide(${sp.startIndex})"
+            title="${sp.block}: ${sp.name} (Slides ${sp.slideRange})"
+            class="group relative h-2.5 rounded-full overflow-hidden bg-slate-800/90 transition-all cursor-pointer ${isCurrentBlock ? 'ring-2 ring-offset-1 ring-offset-slate-950 scale-y-110' : 'opacity-75 hover:opacity-100'}"
+            style="${isCurrentBlock ? `ring-color: ${sp.hex}; box-shadow: 0 0 12px rgba(${sp.rgb}, 0.55);` : ''}"
+          >
+            <div
+              class="h-full rounded-full transition-all duration-500"
+              style="width: ${fillPct}%; background-color: ${sp.hex};"
+            ></div>
+          </button>
+        `;
+      }).join('');
+
+      // Indicador visual de Inicio o Cierre de Bloque en la parte superior del panel
+      const statusBar = document.getElementById('block-status-bar');
+      let statusPill = '';
+      if (slide.isBlockStart) {
+        statusPill = `
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full accent-bg-soft border accent-border text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-100">
+            <span class="w-2 h-2 rounded-full accent-bg beacon-dot"></span>
+            <span class="accent-text">INICIO DE BLOQUE</span>
+            <span class="text-slate-500">·</span>
+            <span>EXPOSITOR 0${speaker.id} DE 06</span>
+            <span class="hidden sm:inline text-slate-400">(${speaker.colorName})</span>
+          </div>
+        `;
+      } else if (slide.isBlockEnd) {
+        const nextText = nextSpeaker
+          ? `SIGUIENTE: ${nextSpeaker.name.split(',')[0].toUpperCase()} (${nextSpeaker.shortBlock})`
+          : 'CIERRE DE EXPOSICIÓN · EQUIPO N.º 03';
+        statusPill = `
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700/80 text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-300">
+            <span class="w-2 h-2 rounded-full accent-bg"></span>
+            <span class="accent-text">CIERRE DE BLOQUE 0${speaker.id}</span>
+            <span class="text-slate-500">·</span>
+            <span class="text-slate-200">${nextText}</span>
+          </div>
+        `;
+      }
+
+      statusBar.innerHTML = `
+        ${statusPill}
+        <div class="font-mono text-[11px] text-slate-400 flex items-center gap-2">
+          <span class="accent-text font-bold">SLIDE ${slide.num}</span>
+          <span>/</span>
+          <span>${speaker.name}</span>
+        </div>
+      `;
+    }
+
+    /* -------------------------------------------------------------------------
+       8. PLANTILLAS HTML POR DIAPOSITIVA (12 SLIDES INTERACTIVAS)
+       ------------------------------------------------------------------------- */
+    function renderSlide01() {
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <!-- Panel Hero Principal -->
+          <div class="lg:col-span-7 dash-card rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 accent-bg pointer-events-none"></div>
+
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-950/80 border border-slate-700/80 font-mono text-xs text-slate-300 mb-4">
+                <span class="accent-text font-bold">UNJFSC</span>
+                <span class="text-slate-600">·</span>
+                <span>Ing. de Sistemas</span>
+                <span class="text-slate-600">·</span>
+                <span>Auditoría de TI · 2026</span>
+              </div>
+
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.12]">
+                Auditoría de la <span class="accent-text">Seguridad de la Información</span>
+              </h1>
+
+              <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+                Fundamentos, Marcos Normativos, Metodología Técnica y Aplicación Empresarial en la Economía Digital.
+              </p>
+            </div>
+
+            <div class="mt-6 pt-5 border-t border-slate-800/90 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                <div class="font-mono text-[10px] uppercase text-slate-400">Docente</div>
+                <div class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5">Ing. Fernando Sosimo Costilla Retuerto</div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                <div class="font-mono text-[10px] uppercase text-slate-400">Organización</div>
+                <div class="text-xs sm:text-sm font-semibold accent-text mt-0.5">Equipo N.º 03 · 6 Bloques</div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                <div class="font-mono text-[10px] uppercase text-slate-400">Navegación</div>
+                <div class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5">Teclas ← / → o Clic Directo</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mapa de los 6 Integrantes (Clic para saltar al bloque) -->
+          <div class="lg:col-span-5 dash-card rounded-2xl p-5 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text">Distribución de Exposición</div>
+                <h2 class="text-base font-bold text-white">Integrantes &amp; Paleta por Bloque</h2>
+              </div>
+              <span class="font-mono text-[10px] px-2 py-1 rounded bg-slate-950 text-slate-400 border border-slate-800">CLIC PARA IR</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
+              ${SPEAKERS.map(sp => `
+                <button onclick="goToSlide(${sp.startIndex})" class="w-full text-left p-2.5 rounded-xl bg-slate-950/65 hover:bg-slate-900 border border-slate-800/90 transition-all flex items-center gap-3 group cursor-pointer" style="border-left: 4px solid ${sp.hex};">
+                  <div class="w-9 h-9 rounded-lg font-mono font-bold text-xs flex items-center justify-center shrink-0 text-slate-950" style="background-color: ${sp.hex};">
+                    ${sp.initials}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-xs sm:text-sm font-semibold text-slate-100 truncate group-hover:text-white">${sp.name}</span>
+                      <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 shrink-0" style="color: ${sp.hex};">S${sp.slideRange}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 truncate mt-0.5">${sp.topic}</div>
+                  </div>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide02() {
+      const activePillar = S2_PILLARS[state.s2Pillar];
+      const activeEval = S2_EVAL_TABS[state.s2EvalTab];
+
+      return `
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Fundamentos, Tríada CIA Ampliada y Enfoques de Evaluación</h1>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">Examen sistemático, independiente y basado en evidencia para garantizar la confianza digital (ISACA, 2023).</p>
+            </div>
+            <div class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300">
+              <span class="accent-text font-semibold">Ética ITAF:</span> Independencia de hecho y apariencia · Confidencialidad
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <!-- Izquierda: Tríada CIA + Ampliada -->
+            <div class="lg:col-span-6 dash-card rounded-2xl p-5 flex flex-col justify-between gap-4">
+              <div>
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-2.5">1. Propiedades de la Información (Selecciona un pilar)</div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  ${Object.entries(S2_PILLARS).map(([key, item]) => `
+                    <button onclick="setSlideState('s2Pillar', '${key}')" class="p-2.5 rounded-xl border text-left transition-all cursor-pointer ${state.s2Pillar === key ? 'dash-card-active text-white' : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-600'}">
+                      <div class="font-mono text-[9px] uppercase ${state.s2Pillar === key ? 'accent-text' : 'text-slate-500'}">${item.tag.split('·')[0]}</div>
+                      <div class="text-xs sm:text-sm font-bold mt-0.5">${item.title}</div>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Panel de detalle del pilar seleccionado -->
+              <div class="p-4 rounded-xl bg-slate-950/80 border accent-border space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-[10px] uppercase accent-text font-bold">${activePillar.tag}</span>
+                  <span class="text-sm font-bold text-white">${activePillar.title}</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${activePillar.def}</p>
+                <div class="p-2.5 rounded-lg accent-bg-soft border border-slate-800 text-xs text-slate-200">
+                  <span class="font-semibold accent-text">¿Cómo se audita?</span> ${activePillar.audit}
+                </div>
+                <div class="text-[11px] text-slate-400 italic">${activePillar.example}</div>
+              </div>
+            </div>
+
+            <!-- Derecha: Comparativa de Enfoques -->
+            <div class="lg:col-span-6 dash-card rounded-2xl p-5 flex flex-col justify-between gap-4">
+              <div>
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-2.5">2. Diferenciación de Disciplinas de Seguridad</div>
+                <div class="grid grid-cols-3 gap-2">
+                  ${Object.entries(S2_EVAL_TABS).map(([key, tab]) => `
+                    <button onclick="setSlideState('s2EvalTab', '${key}')" class="px-2.5 py-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${state.s2EvalTab === key ? 'dash-card-active text-white' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'}">
+                      ${tab.name.replace('Prueba de Penetración ', '').replace('Evaluación de ', 'Eval. ')}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3 flex-1">
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                  <h3 class="text-base font-bold text-white">${activeEval.name}</h3>
+                  <span class="font-mono text-[10px] px-2 py-0.5 rounded accent-bg-soft accent-text border accent-border">${activeEval.badge}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                    <div class="font-mono text-[10px] uppercase text-slate-400">Objetivo</div>
+                    <div class="text-slate-200 mt-1">${activeEval.objetivo}</div>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                    <div class="font-mono text-[10px] uppercase text-slate-400">Alcance</div>
+                    <div class="text-slate-200 mt-1">${activeEval.alcance}</div>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                    <div class="font-mono text-[10px] uppercase text-slate-400">Intrusividad</div>
+                    <div class="text-slate-200 mt-1">${activeEval.intrusividad}</div>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800">
+                    <div class="font-mono text-[10px] uppercase text-slate-400">Entregable</div>
+                    <div class="text-slate-200 mt-1">${activeEval.entregable}</div>
+                  </div>
+                </div>
+                <div class="text-[11px] text-slate-400"><span class="accent-text font-semibold">Criterios:</span> ${activeEval.criterio}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide03() {
+      const std = S3_STANDARDS[state.s3Tab];
+      const tabs = [
+        { key: 'iso', label: 'ISO/IEC 27001 & 27002' },
+        { key: 'nist', label: 'NIST CSF 2.0 & 800-53' },
+        { key: 'cobit', label: 'COBIT 2019 & CIS v8.1' },
+        { key: 'pci', label: 'PCI-DSS v4.0.1 & OWASP' }
+      ];
+
+      return `
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Estándares Internacionales de Auditoría y Seguridad</h1>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">Marcos de referencia globales que proveen criterios objetivos y repetibles para auditar controles.</p>
+            </div>
+          </div>
+
+          <!-- Pestañas de Estándares -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+            ${tabs.map(t => `
+              <button onclick="setSlideState('s3Tab', '${t.key}')" class="px-4 py-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all cursor-pointer ${state.s3Tab === t.key ? 'dash-card-active text-white' : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-600'}">
+                ${t.label}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Panel del Estándar Activo -->
+          <div class="dash-card rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+              <div>
+                <h2 class="text-lg sm:text-xl font-bold text-white">${std.title}</h2>
+                <p class="text-xs sm:text-sm text-slate-400">${std.subtitle}</p>
+              </div>
+              <span class="font-mono text-xs px-3 py-1 rounded-full accent-bg-soft accent-text border accent-border">CRITERIO AUDITABLE</span>
+            </div>
+
+            <!-- 4 KPIs -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              ${std.metrics.map(m => `
+                <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800">
+                  <div class="font-mono text-[10px] uppercase text-slate-400">${m.label}</div>
+                  <div class="font-mono text-xl sm:text-2xl font-extrabold accent-text mt-1">${m.value}</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">${m.sub}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- 4 Bloques de Controles -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${std.blocks.map(b => `
+                <div class="p-3.5 rounded-xl bg-slate-900/75 border border-slate-800/90 hover:border-slate-600 transition-colors">
+                  <div class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full accent-bg"></span>
+                    ${b.name}
+                  </div>
+                  <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">${b.desc}</p>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="p-3 rounded-xl accent-bg-soft border accent-border text-xs text-slate-200">
+              ${std.footerNote}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide04() {
+      const activeLaw = S4_LAWS[state.s4Law];
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Marco Regulatorio Peruano Auditable</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Normativa nacional de cumplimiento obligatorio verificada en auditorías del sector privado, público y financiero.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+            <!-- 3 Tarjetas Seleccionables -->
+            <div class="lg:col-span-5 flex flex-col gap-3">
+              ${Object.entries(S4_LAWS).map(([key, law]) => `
+                <button onclick="setSlideState('s4Law', '${key}')" class="flex-1 text-left p-4 rounded-2xl border transition-all cursor-pointer ${state.s4Law === key ? 'dash-card-active' : 'dash-card hover:border-slate-600'}">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded accent-bg-soft accent-text border accent-border">${law.code}</span>
+                    <span class="font-mono text-[10px] text-slate-400">${state.s4Law === key ? 'ACTIVO ●' : 'VER DETALLE →'}</span>
+                  </div>
+                  <h3 class="text-sm sm:text-base font-bold text-white mt-2.5">${law.title}</h3>
+                  <p class="text-xs text-slate-400 mt-1">${law.entity}</p>
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- Visor de Detalle de Obligaciones Auditables -->
+            <div class="lg:col-span-7 dash-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-4">
+              <div>
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                  <div>
+                    <span class="font-mono text-xs uppercase accent-text font-bold">${activeLaw.code}</span>
+                    <h2 class="text-lg sm:text-xl font-bold text-white mt-0.5">${activeLaw.title}</h2>
+                  </div>
+                </div>
+
+                <div class="mt-3 p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300">
+                  <span class="font-semibold text-white">Ámbito de aplicación:</span> ${activeLaw.scope}
+                </div>
+
+                <div class="mt-4">
+                  <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-2.5">Obligaciones Directamente Auditables</div>
+                  <ul class="space-y-2">
+                    ${activeLaw.obligations.map((ob, idx) => `
+                      <li class="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
+                        <span class="font-mono text-[11px] font-bold accent-text mt-0.5">0${idx + 1}.</span>
+                        <span>${ob}</span>
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-red-950/35 border border-red-500/35 text-xs text-red-200">
+                <span class="font-mono font-bold uppercase text-red-400">Impacto por incumplimiento:</span> ${activeLaw.impact}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide05() {
+      const activePhase = S5_PHASES[state.s5Phase];
+      const activeEv = S5_EVIDENCE[state.s5Evidence];
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Metodología, Ciclo de Vida y Obtención de Evidencia</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Proceso estructurado en cuatro fases gobernado por el marco ITAF (ISACA, 2020) e ISO 19011.</p>
+          </div>
+
+          <!-- Stepper Horizontal de 4 Fases -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+            ${S5_PHASES.map((ph, idx) => `
+              <button onclick="setSlideState('s5Phase', ${idx})" class="p-3.5 rounded-xl border text-left transition-all cursor-pointer ${state.s5Phase === idx ? 'dash-card-active' : 'bg-slate-900/80 border-slate-800 hover:border-slate-600'}">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-xs font-extrabold ${state.s5Phase === idx ? 'accent-text' : 'text-slate-500'}">FASE ${ph.step}</span>
+                  ${state.s5Phase === idx ? '<span class="w-2 h-2 rounded-full accent-bg"></span>' : ''}
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-white mt-1">${ph.name}</div>
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Detalle de la Fase Seleccionada -->
+          <div class="dash-card rounded-2xl p-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+              <div>
+                <h2 class="text-base sm:text-lg font-bold text-white">Fase ${activePhase.step}: ${activePhase.name}</h2>
+                <p class="text-xs text-slate-400 mt-0.5">${activePhase.desc}</p>
+              </div>
+              <span class="font-mono text-[10px] px-2.5 py-1 rounded-full accent-bg-soft accent-text border accent-border">${activePhase.tag}</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-3.5">
+              ${activePhase.bullets.map(b => `
+                <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800/90 text-xs sm:text-sm text-slate-200 flex items-start gap-2.5">
+                  <span class="accent-text font-bold mt-0.5">▸</span>
+                  <span>${b}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Panel Inferior: 4 Atributos de la Evidencia Válida (ITAF) -->
+          <div class="dash-card rounded-2xl p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+            <div class="lg:col-span-5">
+              <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-2">Atributos de Evidencia Válida (ITAF)</div>
+              <div class="grid grid-cols-2 gap-2">
+                ${Object.entries(S5_EVIDENCE).map(([k, v]) => `
+                  <button onclick="setSlideState('s5Evidence', '${k}')" class="px-3 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${state.s5Evidence === k ? 'dash-card-active text-white' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'}">
+                    ${v.title}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            <div class="lg:col-span-7 p-3.5 rounded-xl bg-slate-950/75 border accent-border">
+              <div class="text-sm font-bold accent-text">${activeEv.title}</div>
+              <p class="text-xs sm:text-sm text-slate-200 mt-1">${activeEv.desc}</p>
+              <div class="text-[11px] text-slate-400 mt-1.5 font-mono">${activeEv.check}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide06() {
+      const el = S6_ELEMENTS[state.s6Element];
+      const sev = S6_SEVERITIES[state.s6Severity];
+      const op = S6_OPINIONS[state.s6Opinion];
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Estructura del Hallazgo, Criticidad CVSS y Dictámenes</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Formulación objetiva de brechas, priorización del riesgo residual y opinión profesional del auditor.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <!-- Izquierda: 5 Elementos del Hallazgo -->
+            <div class="lg:col-span-6 dash-card rounded-2xl p-5 flex flex-col justify-between gap-4">
+              <div>
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-2.5">1. Anatomía del Hallazgo Formal</div>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  ${Object.entries(S6_ELEMENTS).map(([k, item], i) => `
+                    <button onclick="setSlideState('s6Element', '${k}')" class="p-2.5 rounded-xl border text-center transition-all cursor-pointer ${state.s6Element === k ? 'dash-card-active text-white' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'}">
+                      <div class="font-mono text-[10px] ${state.s6Element === k ? 'accent-text' : 'text-slate-500'}">0${i + 1}</div>
+                      <div class="text-[11px] font-bold mt-0.5 capitalize">${k === 'recomendacion' ? 'Recom.' : k}</div>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-950/80 border accent-border flex-1 flex flex-col justify-between gap-3">
+                <div>
+                  <h3 class="text-base font-bold text-white">${el.title}</h3>
+                  <p class="text-xs sm:text-sm text-slate-200 mt-2 leading-relaxed">${el.desc}</p>
+                </div>
+                <div class="p-3 rounded-lg accent-bg-soft border border-slate-800 text-xs text-slate-200 font-mono">
+                  ${el.sample}
+                </div>
+              </div>
+            </div>
+
+            <!-- Derecha: Criticidad CVSS + 4 Dictámenes -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
+              <!-- Selector de Criticidad -->
+              <div class="dash-card rounded-2xl p-4 sm:p-5 space-y-3">
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text">2. Matriz de Criticidad &amp; Ventana CAP</div>
+                <div class="grid grid-cols-4 gap-2">
+                  ${Object.entries(S6_SEVERITIES).map(([k, s]) => `
+                    <button onclick="setSlideState('s6Severity', '${k}')" class="p-2 rounded-xl border text-center transition-all cursor-pointer ${state.s6Severity === k ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'}" style="${state.s6Severity === k ? `border-color: ${s.color}; box-shadow: 0 0 14px -4px ${s.color};` : ''}">
+                      <div class="text-xs font-bold" style="color: ${s.color};">${s.label}</div>
+                      <div class="font-mono text-[10px] text-slate-400 mt-0.5">${s.cvss}</div>
+                    </button>
+                  `).join('')}
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1.5" style="border-left: 4px solid ${sev.color};">
+                  <div class="flex items-center justify-between font-mono">
+                    <span class="font-bold" style="color: ${sev.color};">NIVEL ${sev.label.toUpperCase()} (CVSS ${sev.cvss})</span>
+                    <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-200">Plazo: ${sev.window}</span>
+                  </div>
+                  <p class="text-slate-200">${sev.desc}</p>
+                  <p class="text-slate-400"><strong class="text-slate-300">Impacto:</strong> ${sev.impact}</p>
+                </div>
+              </div>
+
+              <!-- 4 Tipos de Dictamen -->
+              <div class="dash-card rounded-2xl p-4 sm:p-5 space-y-3">
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text">3. Tipos de Dictamen Profesional</div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  ${Object.entries(S6_OPINIONS).map(([k, item]) => `
+                    <button onclick="setSlideState('s6Opinion', '${k}')" class="p-2 rounded-xl border text-left transition-all cursor-pointer ${state.s6Opinion === k ? 'bg-slate-900 text-white' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'}" style="${state.s6Opinion === k ? `border-color: ${item.color};` : ''}">
+                      <div class="text-[11px] font-bold" style="color: ${item.color};">${item.title}</div>
+                      <div class="text-[10px] text-slate-400 truncate">${item.short}</div>
+                    </button>
+                  `).join('')}
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950/75 border border-slate-800 text-xs text-slate-200">
+                  <span class="font-bold" style="color: ${op.color};">${op.title}:</span> ${op.desc}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide07() {
+      const tab = S7_TABS[state.s7Tab];
+      const nav = [
+        { key: 'fisica', label: '1. Seguridad Física y Ambiental' },
+        { key: 'redes', label: '2. Redes y Perímetro' },
+        { key: 'zerotrust', label: '3. Zero Trust (NIST SP 800-207)' }
+      ];
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Seguridad Física, Redes Perimetrales y Zero Trust</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Verificación integral de la defensa en profundidad desde el data center hasta sesiones microsegmentadas.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            ${nav.map(n => `
+              <button onclick="setSlideState('s7Tab', '${n.key}')" class="px-4 py-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all cursor-pointer ${state.s7Tab === n.key ? 'dash-card-active text-white' : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white'}">
+                ${n.label}
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="dash-card rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+              <div>
+                <h2 class="text-lg sm:text-xl font-bold text-white">${tab.title}</h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-0.5">${tab.lead}</p>
+              </div>
+              <span class="font-mono text-[11px] px-3 py-1 rounded-full accent-bg-soft accent-text border accent-border">${tab.ref}</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              ${tab.items.map((item, i) => `
+                <div class="p-4 rounded-xl bg-slate-950/75 border border-slate-800/90">
+                  <div class="flex items-center gap-2.5">
+                    <span class="font-mono text-xs font-bold px-2 py-0.5 rounded accent-bg-soft accent-text">0${i + 1}</span>
+                    <h3 class="text-sm font-bold text-white">${item.name}</h3>
+                  </div>
+                  <p class="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">${item.desc}</p>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="p-3.5 rounded-xl accent-bg-soft border accent-border text-xs sm:text-sm text-slate-100">
+              ${tab.evidence}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide08() {
+      const active = S8_CARDS[state.s8Card];
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Auditoría de IAM/PAM y Endurecimiento de Servidores</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Haz clic en cada dominio de control para inspeccionar el riesgo cubierto y la prueba CAAT de auditoría.</p>
+          </div>
+
+          <!-- Grid de 6 Tarjetas Interactivas -->
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            ${S8_CARDS.map((card, i) => `
+              <button onclick="setSlideState('s8Card', ${i})" class="p-3.5 rounded-xl border text-left transition-all cursor-pointer ${state.s8Card === i ? 'dash-card-active' : 'dash-card hover:border-slate-600'}">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-mono text-[10px] uppercase ${state.s8Card === i ? 'accent-text font-bold' : 'text-slate-500'}">${card.tag}</span>
+                  <span class="font-mono text-[10px] text-slate-500">0${i + 1}</span>
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-white mt-1.5">${card.title}</div>
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Inspector Técnico del Control Seleccionado -->
+          <div class="dash-card rounded-2xl p-5 border accent-border">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+              <h2 class="text-base sm:text-lg font-bold text-white">${active.title}</h2>
+              <span class="font-mono text-[11px] px-2.5 py-0.5 rounded-full accent-bg-soft accent-text border accent-border">${active.tag}</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+              <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800">
+                <div class="font-mono text-[10px] uppercase accent-text font-bold">Control Auditado</div>
+                <p class="text-xs sm:text-sm text-slate-200 mt-1.5 leading-relaxed">${active.control}</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950/75 border border-red-900/40">
+                <div class="font-mono text-[10px] uppercase text-red-400 font-bold">Riesgo si Falla</div>
+                <p class="text-xs sm:text-sm text-slate-200 mt-1.5 leading-relaxed">${active.risk}</p>
+              </div>
+              <div class="p-3.5 rounded-xl accent-bg-soft border accent-border">
+                <div class="font-mono text-[10px] uppercase accent-text font-bold">Prueba CAAT / Evidencia</div>
+                <p class="text-xs sm:text-sm text-slate-100 mt-1.5 leading-relaxed">${active.test}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide09() {
+      const stage = S9_STAGES[state.s9Stage];
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Bases de Datos, Criptografía y DevSecOps</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Auditoría continua a lo largo del ciclo de vida de desarrollo seguro (SSDLC) hasta la capa criptográfica de datos.</p>
+          </div>
+
+          <!-- Diagrama Interactivo del Pipeline DevSecOps -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+            ${S9_STAGES.map((st, idx) => `
+              <button onclick="setSlideState('s9Stage', ${idx})" class="relative p-3.5 rounded-xl border text-left transition-all cursor-pointer ${state.s9Stage === idx ? 'dash-card-active' : 'bg-slate-900/80 border-slate-800 hover:border-slate-600'}">
+                <div class="font-mono text-[11px] font-bold ${state.s9Stage === idx ? 'accent-text' : 'text-slate-500'}">ETAPA ${st.step}</div>
+                <div class="text-xs sm:text-sm font-bold text-white mt-1">${st.name}</div>
+                <div class="text-[10px] text-slate-400 truncate mt-0.5">${st.subtitle}</div>
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Detalle de la Etapa del Pipeline -->
+          <div class="dash-card rounded-2xl p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div class="lg:col-span-8 space-y-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded accent-bg text-slate-950">ETAPA ${stage.step}</span>
+                <h2 class="text-lg sm:text-xl font-bold text-white">${stage.name} · <span class="text-slate-400 font-medium text-base">${stage.subtitle}</span></h2>
+              </div>
+              <div class="space-y-2.5 pt-1">
+                ${stage.checks.map((c, idx) => `
+                  <div class="p-3 rounded-xl bg-slate-950/75 border border-slate-800 text-xs sm:text-sm text-slate-200 flex items-start gap-2.5">
+                    <span class="font-mono text-xs font-bold accent-text mt-0.5">0${idx + 1}.</span>
+                    <span>${c}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="lg:col-span-4 flex flex-col justify-between gap-3">
+              <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800">
+                <div class="font-mono text-[10px] uppercase accent-text font-bold mb-2">Herramientas &amp; Estándares</div>
+                <div class="flex flex-wrap gap-2">
+                  ${stage.tools.map(t => `
+                    <span class="font-mono text-xs px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-200">${t}</span>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl accent-bg-soft border accent-border flex-1">
+                <div class="font-mono text-[10px] uppercase accent-text font-bold">Evidencia Solicitada por el Auditor</div>
+                <p class="text-xs sm:text-sm text-slate-100 mt-1.5 leading-relaxed">${stage.evidence}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide10() {
+      const modelInfo = S10_MODEL_INFO[state.s10Model];
+
+      const badgeFor = (owner) => {
+        if (owner === 'client') {
+          return { text: 'CLIENTE (EN la nube)', bg: 'background-color: rgba(var(--accent-rgb), 0.22); border-color: var(--accent); color: #fff;', width: '100%' };
+        }
+        if (owner === 'shared') {
+          return { text: 'RESPONSABILIDAD COMPARTIDA', bg: 'background-color: rgba(245, 158, 11, 0.20); border-color: #f59e0b; color: #fde68a;', width: '65%' };
+        }
+        return { text: 'PROVEEDOR (DE la nube)', bg: 'background-color: rgba(71, 85, 105, 0.32); border-color: #64748b; color: #cbd5e1;', width: '100%' };
+      };
+
+      return `
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Auditoría en la Nube y Responsabilidad Compartida</h1>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">Simulador interactivo para distinguir controles del cliente frente al proveedor (Cloud Security Alliance, 2021).</p>
+            </div>
+            <!-- Selector IaaS / PaaS / SaaS -->
+            <div class="inline-flex p-1 rounded-xl bg-slate-950 border border-slate-800 gap-1">
+              ${['iaas', 'paas', 'saas'].map(m => `
+                <button onclick="setSlideState('s10Model', '${m}')" class="px-4 py-1.5 rounded-lg font-mono text-xs font-bold uppercase transition-all cursor-pointer ${state.s10Model === m ? 'accent-bg text-slate-950 shadow' : 'text-slate-400 hover:text-white'}">
+                  ${m}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+            <!-- Simulador Visual de Capas -->
+            <div class="lg:col-span-7 dash-card rounded-2xl p-5 flex flex-col justify-between gap-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                <div>
+                  <h2 class="text-base font-bold text-white">${modelInfo.title}</h2>
+                  <div class="font-mono text-[11px] text-slate-400">${modelInfo.examples}</div>
+                </div>
+                <div class="flex items-center gap-3 text-[10px] font-mono">
+                  <span class="flex items-center gap-1 text-slate-200"><span class="w-2.5 h-2.5 rounded-sm accent-bg"></span>Cliente</span>
+                  <span class="flex items-center gap-1 text-slate-400"><span class="w-2.5 h-2.5 rounded-sm bg-slate-600"></span>Proveedor</span>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                ${S10_LAYERS.map(layer => {
+                  const role = layer[state.s10Model];
+                  const style = badgeFor(role);
+                  return `
+                    <div class="p-2.5 rounded-xl bg-slate-950/75 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all">
+                      <span class="text-xs sm:text-sm font-medium text-slate-200">${layer.name}</span>
+                      <span class="font-mono text-[10px] font-bold px-2.5 py-1 rounded-lg border shrink-0 text-center" style="${style.bg}">
+                        ${style.text}
+                      </span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              <div class="p-3 rounded-xl accent-bg-soft border accent-border text-xs text-slate-100">
+                <span class="font-bold accent-text">Foco del Auditor:</span> ${modelInfo.auditFocus}
+              </div>
+            </div>
+
+            <!-- Panel Lateral: Evidencias Clave Cloud -->
+            <div class="lg:col-span-5 dash-card rounded-2xl p-5 flex flex-col justify-between gap-3">
+              <div>
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-3">Evidencias Críticas en Auditoría Cloud</div>
+                <div class="space-y-2.5 text-xs">
+                  <div class="p-3 rounded-xl bg-slate-950/75 border border-slate-800">
+                    <div class="font-bold text-white">Aseguramiento del Proveedor</div>
+                    <p class="text-slate-400 mt-1">Revisión de informes <span class="text-slate-200 font-semibold">SOC 2 Tipo II</span>, ISO/IEC 27001, matriz <span class="text-slate-200 font-semibold">CSA CCM v4.0</span> y controles CUEC.</p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-950/75 border border-slate-800">
+                    <div class="font-bold text-white">Cuenta Raíz y Políticas IAM</div>
+                    <p class="text-slate-400 mt-1">Bloqueo de cuenta root con MFA obligatorio, cero claves de acceso raíz y políticas JSON sin comodines (<code class="accent-text">*:*</code>).</p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-950/75 border border-slate-800">
+                    <div class="font-bold text-white">Almacenamiento y Red</div>
+                    <p class="text-slate-400 mt-1">Privacidad estricta de buckets/blobs (bloqueo de acceso público), cifrado de snapshots y grupos de seguridad cerrados.</p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-950/75 border border-slate-800">
+                    <div class="font-bold text-white">Pistas Nativas y CSPM</div>
+                    <p class="text-slate-400 mt-1">Habilitación de <span class="text-slate-200">CloudTrail / Activity Log</span>, escaneo con <span class="text-slate-200">ScoutSuite / Prowler</span> y revisión de plantillas IaC (Terraform).</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide11() {
+      const checkedCount = Object.values(state.s11Checks).filter(Boolean).length;
+      const total = S11_FINDINGS.length;
+      const pct = Math.round((checkedCount / total) * 100);
+
+      // Cálculo de estado dinámico de riesgo residual y dictamen
+      const critRemediated = state.s11Checks['H-01'] && state.s11Checks['H-02'];
+      let opinionLabel = 'CON SALVEDADES';
+      let opinionColor = '#f59e0b';
+      let riskLabel = 'RIESGO RESIDUAL CRÍTICO';
+      if (pct === 100) {
+        opinionLabel = 'FAVORABLE (REMEDIADO)';
+        opinionColor = '#10b981';
+        riskLabel = 'RIESGO CONTROLADO';
+      } else if (critRemediated) {
+        opinionLabel = 'EN REMEDIACIÓN AVANZADA';
+        opinionColor = '#38bdf8';
+        riskLabel = 'RIESGO RESIDUAL MEDIO';
+      }
+
+      // Parámetros del anillo SVG circular
+      const radius = 42;
+      const circumference = 2 * Math.PI * radius;
+      const dashOffset = circumference - (pct / 100) * circumference;
+
+      return `
+        <div class="space-y-3.5">
+          <!-- Encabezado y Contexto Financiera Andina -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Caso Práctico: <span class="accent-text">Financiera Andina S.A.</span></h1>
+              <p class="text-xs sm:text-sm text-slate-400 mt-0.5">650 colaboradores · 18 agencias · Core On-Premise + Banca Móvil Cloud · Criterios: SBS 504-2021, ISO 27001:2022, PCI-DSS v4.0.1 y Ley 29733.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="setAllChecks(true)" class="px-3 py-1.5 rounded-lg accent-bg-soft border accent-border text-xs font-semibold text-white hover:brightness-110 cursor-pointer">Marcar todo</button>
+              <button onclick="setAllChecks(false)" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-medium text-slate-300 hover:text-white cursor-pointer">Reiniciar checklist</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+            <!-- Panel Izquierdo: Indicador Circular y Estado del Dictamen -->
+            <div class="lg:col-span-4 dash-card rounded-2xl p-5 flex flex-col justify-between gap-4">
+              <div class="text-center">
+                <div class="font-mono text-[11px] uppercase tracking-wider accent-text mb-3">Avance del Plan CAP en Vivo</div>
+                <div class="relative inline-flex items-center justify-center">
+                  <svg class="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="${radius}" fill="none" stroke="rgba(30, 41, 59, 0.9)" stroke-width="8"></circle>
+                    <circle
+                      cx="50" cy="50" r="${radius}" fill="none"
+                      stroke="${opinionColor}" stroke-width="8" stroke-linecap="round"
+                      stroke-dasharray="${circumference}"
+                      stroke-dashoffset="${dashOffset}"
+                      style="transition: stroke-dashoffset 0.5s ease, stroke 0.5s ease;"
+                    ></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="font-mono text-2xl font-extrabold text-white">${pct}%</span>
+                    <span class="font-mono text-[10px] text-slate-400">${checkedCount} de ${total}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2.5">
+                <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
+                  <div class="font-mono text-[10px] uppercase text-slate-400">Estado de Dictamen</div>
+                  <div class="font-mono text-xs sm:text-sm font-bold mt-1" style="color: ${opinionColor};">${opinionLabel}</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
+                  <div class="font-mono text-[10px] uppercase text-slate-400">Postura de Riesgo</div>
+                  <div class="font-mono text-xs font-semibold text-slate-200 mt-1">${riskLabel}</div>
+                </div>
+                <p class="text-[11px] text-slate-400 text-center">
+                  Marca cada hallazgo remediado para demostrar la auditoría de seguimiento ante el Comité.
+                </p>
+              </div>
+            </div>
+
+            <!-- Panel Derecho: Checklist Interactivo de los 5 Hallazgos -->
+            <div class="lg:col-span-8 dash-card rounded-2xl p-4 sm:p-5 space-y-2.5">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <span class="font-mono text-[11px] uppercase tracking-wider accent-text">Checklist Interactivo de Hallazgos (H-01 a H-05)</span>
+                <span class="font-mono text-[11px] text-slate-400">2 Críticos · 2 Altos · 1 Medio</span>
+              </div>
+
+              <div class="space-y-2">
+                ${S11_FINDINGS.map(f => {
+                  const isDone = !!state.s11Checks[f.id];
+                  return `
+                    <label class="flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer ${isDone ? 'bg-emerald-950/25 border-emerald-500/45' : 'bg-slate-950/75 border-slate-800 hover:border-slate-600'}">
+                      <input
+                        type="checkbox"
+                        ${isDone ? 'checked' : ''}
+                        onchange="toggleFinding('${f.id}')"
+                        class="mt-1 w-4 h-4 rounded accent-sky-400 cursor-pointer shrink-0"
+                      />
+                      <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                          <div class="flex items-center gap-2 min-w-0">
+                            <span class="font-mono text-[11px] font-bold text-white">${f.id}</span>
+                            <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded uppercase" style="background-color: ${isDone ? 'rgba(16,185,129,0.2)' : `${f.sevColor}22`}; color: ${isDone ? '#34d399' : f.sevColor};">
+                              ${isDone ? 'REMEDIADO ✓' : f.severity}
+                            </span>
+                            <span class="text-xs sm:text-sm font-semibold ${isDone ? 'line-through text-slate-400' : 'text-slate-100'}">${f.title}</span>
+                          </div>
+                        </div>
+                        <div class="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-slate-400">
+                          <div><span class="text-slate-300 font-medium">Acción CAP:</span> ${f.action}</div>
+                          <div><span class="text-slate-300 font-medium">Responsable:</span> ${f.owner} · <span class="font-mono text-[10px]">${f.criteria}</span></div>
+                        </div>
+                      </div>
+                    </label>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSlide12() {
+      const tabs = [
+        { key: 'continuidad', label: '1. Continuidad y Resiliencia (SOC / BCP)' },
+        { key: 'tendencias', label: '2. Tendencias Emergentes' },
+        { key: 'conclusiones', label: '3. Conclusiones & Cierre Equipo 03' }
+      ];
+
+      let bodyHtml = '';
+
+      if (state.s12Tab === 'continuidad') {
+        bodyHtml = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-5 rounded-xl bg-slate-950/75 border border-slate-800 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white">Detección y Respuesta (SOC / SIEM / CSIRT)</h3>
+                <span class="font-mono text-[10px] px-2 py-0.5 rounded accent-bg-soft accent-text">DETECTAR · RESPONDER</span>
+              </div>
+              <ul class="space-y-2 text-xs sm:text-sm text-slate-300">
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Ingesta efectiva al SIEM de telemetría crítica: firewalls, AD, EDR, bases de datos y cloud.</span></li>
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Medición auditable de <strong>MTTD</strong> (Tiempo Medio de Detección) y <strong>MTTR</strong> (Tiempo Medio de Respuesta).</span></li>
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Plan de Respuesta a Incidentes (IRP), roles CSIRT, cadena de custodia forense y notificación legal a SBS / ANPD.</span></li>
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Ejecución documentada de simulacros de escritorio (<em>tabletop exercises</em>).</span></li>
+              </ul>
+            </div>
+
+            <div class="p-5 rounded-xl bg-slate-950/75 border border-slate-800 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white">Continuidad del Negocio (BCP / DRP)</h3>
+                <span class="font-mono text-[10px] px-2 py-0.5 rounded accent-bg-soft accent-text">RECUPERAR</span>
+              </div>
+              <ul class="space-y-2 text-xs sm:text-sm text-slate-300">
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Validación del Análisis de Impacto al Negocio (<strong>BIA</strong>) para priorizar procesos de misión crítica.</span></li>
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Comprobación empírica de <strong>RTO</strong> (tiempo máximo de recuperación) y <strong>RPO</strong> (pérdida máxima tolerable de datos).</span></li>
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Informes reales de pruebas de conmutación (<em>failover</em>) y retorno (<em>failback</em>) en sitio alterno.</span></li>
+                <li class="flex items-start gap-2"><span class="accent-text">▸</span><span>Respaldos aislados (<em>air-gapped</em>) o inmutables (WORM) verificados frente a ransomware.</span></li>
+              </ul>
+            </div>
+          </div>
+        `;
+      } else if (state.s12Tab === 'tendencias') {
+        bodyHtml = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div class="p-4 rounded-xl bg-slate-950/75 border border-slate-800">
+              <div class="font-mono text-[10px] uppercase accent-text font-bold">01 · DE FOTO ANUAL A TIEMPO REAL</div>
+              <h3 class="text-sm sm:text-base font-bold text-white mt-1">Auditoría Continua (CCM) &amp; Compliance-as-Code</h3>
+              <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Integraciones API para evaluar el 100 % de activos en tiempo casi real y políticas ejecutables (Open Policy Agent) que bloquean despliegues no conformes.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950/75 border border-slate-800">
+              <div class="font-mono text-[10px] uppercase accent-text font-bold">02 · DOBLE DIMENSIÓN DE IA</div>
+              <h3 class="text-sm sm:text-base font-bold text-white mt-1">IA Aplicada &amp; Auditoría de Sistemas de IA</h3>
+              <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Detección de anomalías en millones de logs y evaluación de nuevos riesgos: <em>Prompt Injection</em>, <em>Data Poisoning</em> y fuga de datos por <em>Shadow AI</em>.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950/75 border border-slate-800">
+              <div class="font-mono text-[10px] uppercase accent-text font-bold">03 · CADENA DE SUMINISTRO</div>
+              <h3 class="text-sm sm:text-base font-bold text-white mt-1">SBOM y Riesgo de Cuarta Parte</h3>
+              <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Exigencia de Listas de Materiales de Software (SBOM), firma criptográfica de artefactos en compilación y evaluación continua de terceros (NIST CSF 2.0).</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950/75 border border-slate-800">
+              <div class="font-mono text-[10px] uppercase accent-text font-bold">04 · RESILIENCIA FUTURA</div>
+              <h3 class="text-sm sm:text-base font-bold text-white mt-1">Agilidad Criptográfica y Preparación Poscuántica</h3>
+              <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Inventarios de activos criptográficos y planes de transición hacia algoritmos poscuánticos NIST frente a la amenaza <em>"harvest now, decrypt later"</em>.</p>
+            </div>
+          </div>
+        `;
+      } else {
+        bodyHtml = `
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800 text-xs sm:text-sm text-slate-200">
+                <span class="font-mono font-bold accent-text">C1 · Aseguramiento Estratégico:</span> La auditoría integra CIA ampliada y gobierno corporativo, diferenciándose claramente del pentesting por su enfoque sistémico y normativo.
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800 text-xs sm:text-sm text-slate-200">
+                <span class="font-mono font-bold accent-text">C2 · Sinergia Normativa:</span> Articular ISO 27001:2022, NIST CSF 2.0, COBIT 2019 y OWASP con la Ley 29733, D.L. 1412 y SBS 504-2021 garantiza criterios objetivos y defendibles.
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800 text-xs sm:text-sm text-slate-200">
+                <span class="font-mono font-bold accent-text">C3 · Gobernanza sobre Herramientas:</span> El caso práctico demostró que las brechas críticas nacen de fallas básicas (bajas manuales, excepciones sin MFA, backups sin cifrar) más que de falta de tecnología.
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800 text-xs sm:text-sm text-slate-200">
+                <span class="font-mono font-bold accent-text">C4 · Auditor del Siglo XXI:</span> La auditoría continua, Compliance-as-Code, IA segura y agilidad poscuántica consolidan al auditor como socio indispensable de la confianza digital.
+              </div>
+            </div>
+
+            <!-- Cierre elegante con los 6 integrantes -->
+            <div class="p-4 rounded-xl accent-bg-soft border accent-border flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <div class="font-mono text-xs uppercase accent-text font-bold">¡Muchas Gracias por su Atención!</div>
+                <div class="text-sm font-bold text-white mt-0.5">Equipo N.º 03 · UNJFSC · Auditoría de Tecnologías de la Información · 2026</div>
+              </div>
+              <div class="flex flex-wrap justify-center sm:justify-end gap-1.5">
+                ${SPEAKERS.map(sp => `
+                  <span class="text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-950/85 border text-slate-200" style="border-color: ${sp.hex};">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full mr-1" style="background-color: ${sp.hex};"></span>
+                    ${sp.name.split(',')[0]}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Continuidad, Tendencias Futuras y Conclusiones</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">De la resiliencia operativa (SOC/BCP) a la evolución tecnológica de la auditoría de seguridad.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            ${tabs.map(t => `
+              <button onclick="setSlideState('s12Tab', '${t.key}')" class="px-4 py-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all cursor-pointer ${state.s12Tab === t.key ? 'dash-card-active text-white' : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white'}">
+                ${t.label}
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="dash-card rounded-2xl p-5 sm:p-6">
+            ${bodyHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    const SLIDE_RENDERERS = [
+      renderSlide01, renderSlide02, renderSlide03, renderSlide04,
+      renderSlide05, renderSlide06, renderSlide07, renderSlide08,
+      renderSlide09, renderSlide10, renderSlide11, renderSlide12
+    ];
+
+    /* -------------------------------------------------------------------------
+       9. MOTOR DE ACTUALIZACIÓN DE ESTADO E INTERACTIVIDAD LOCAL
+       ------------------------------------------------------------------------- */
+    function renderSlideOnly() {
+      const container = document.getElementById('slide-content');
+      if (!container) return;
+      container.innerHTML = SLIDE_RENDERERS[state.currentSlide]();
+    }
+
+    function renderApp() {
+      renderChrome();
+      const container = document.getElementById('slide-content');
+      container.classList.remove('slide-animate');
+      void container.offsetWidth; // Reinicia animación CSS suavemente
+      container.innerHTML = SLIDE_RENDERERS[state.currentSlide]();
+      container.classList.add('slide-animate');
+    }
+
+    function setSlideState(key, value) {
+      state[key] = value;
+      renderSlideOnly();
+    }
+
+    function toggleFinding(id) {
+      state.s11Checks[id] = !state.s11Checks[id];
+      renderSlideOnly();
+    }
+
+    function setAllChecks(val) {
+      Object.keys(state.s11Checks).forEach(k => {
+        state.s11Checks[k] = val;
+      });
+      renderSlideOnly();
+      showToast(val ? 'Plan CAP completado al 100 % · Dictamen actualizado.' : 'Checklist CAP reiniciado al estado inicial.');
+    }
+
+    /* -------------------------------------------------------------------------
+       10. MODALES: MAPA, IDEAS CLAVE, FUENTES Y PANTALLA COMPLETA
+       ------------------------------------------------------------------------- */
+    function openModal(modalId) {
+      closeAllModals();
+      if (modalId === 'modal-map') renderMapModal();
+      if (modalId === 'modal-notes') renderNotesModal();
+      if (modalId === 'modal-sources') {
+        const input = document.getElementById('source-filter');
+        if (input) input.value = '';
+        renderSourcesList('');
+      }
+      const el = document.getElementById(modalId);
+      if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      }
+    }
+
+    function closeAllModals() {
+      ['modal-map', 'modal-notes', 'modal-sources'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.add('hidden');
+          el.classList.remove('flex');
+        }
+      });
+    }
+
+    function backdropClose(event, modalId) {
+      if (event.target.id === modalId) closeAllModals();
+    }
+
+    function renderMapModal() {
+      const body = document.getElementById('modal-map-body');
+      body.innerHTML = SPEAKERS.map(sp => {
+        const blockSlides = SLIDES.map((s, idx) => ({ ...s, idx })).filter(s => s.speakerId === sp.id);
+        return `
+          <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2.5" style="border-top: 3px solid ${sp.hex};">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg font-mono font-bold text-xs flex items-center justify-center text-slate-950 shrink-0" style="background-color: ${sp.hex};">${sp.initials}</div>
+              <div class="min-w-0">
+                <div class="font-mono text-[10px] font-bold uppercase" style="color: ${sp.hex};">${sp.block} · ${sp.colorName}</div>
+                <div class="text-xs font-bold text-white truncate">${sp.name}</div>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              ${blockSlides.map(sl => {
+                const isCurr = sl.idx === state.currentSlide;
+                return `
+                  <button onclick="goToSlide(${sl.idx})" class="w-full text-left p-2.5 rounded-lg border text-xs transition-all cursor-pointer flex items-center gap-2 ${isCurr ? 'bg-slate-800 text-white font-semibold' : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:bg-slate-800/80'}" style="${isCurr ? `border-color: ${sp.hex};` : ''}">
+                    <span class="font-mono font-bold shrink-0" style="color: ${sp.hex};">${sl.num}</span>
+                    <span class="truncate">${sl.title}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderNotesModal() {
+      const slide = SLIDES[state.currentSlide];
+      const speaker = getSpeaker(slide.speakerId);
+      document.getElementById('notes-meta').textContent = `SLIDE ${slide.num} · ${speaker.block.toUpperCase()} · ${speaker.name}`;
+      document.getElementById('notes-title').textContent = slide.title;
+      document.getElementById('modal-notes-body').innerHTML = `
+        <p class="text-xs text-slate-400 pb-2 border-b border-slate-800">${slide.subtitle}</p>
+        ${slide.notes.map((n, i) => `
+          <div class="p-3.5 rounded-xl bg-slate-950/75 border border-slate-800 flex items-start gap-3">
+            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded accent-bg-soft accent-text border accent-border shrink-0">0${i + 1}</span>
+            <p class="text-sm text-slate-200 leading-relaxed">${n}</p>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function renderSourcesList(query) {
+      const q = (query || '').trim().toLowerCase();
+      const filtered = SOURCES_APA.filter(ref => ref.toLowerCase().includes(q));
+      const container = document.getElementById('modal-sources-body');
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">No se encontraron referencias que coincidan con "${query}".</div>`;
+        return;
+      }
+      container.innerHTML = filtered.map((ref, idx) => `
+        <div class="apa-ref p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors">
+          <span class="font-mono text-[11px] accent-text mr-1.5">[${String(idx + 1).padStart(2, '0')}]</span>${ref}
+        </div>
+      `).join('');
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          } else {
+            showToast('Tu navegador no soporta la Fullscreen API.');
+          }
+        } else if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      } catch (err) {
+        showToast('Pantalla completa bloqueada por el visor integrado. Ábrelo como index.html en tu navegador.');
+      }
+    }
+
+    function syncFullscreenButton() {
+      const active = !!document.fullscreenElement;
+      document.getElementById('icon-fs-enter').classList.toggle('hidden', active);
+      document.getElementById('icon-fs-exit').classList.toggle('hidden', !active);
+      document.getElementById('label-fullscreen').textContent = active ? 'Salir' : 'Presentar';
+    }
+
+    /* -------------------------------------------------------------------------
+       11. EVENTOS DE TECLADO, GESTOS TÁCTILES E INICIALIZACIÓN
+       ------------------------------------------------------------------------- */
+    document.addEventListener('keydown', (e) => {
+      // No interceptar si el usuario escribe en el filtro de fuentes
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        if (e.key === 'Escape') closeAllModals();
+        return;
+      }
+
+      const anyModalOpen = ['modal-map', 'modal-notes', 'modal-sources'].some(
+        id => !document.getElementById(id).classList.contains('hidden')
+      );
+
+      if (e.key === 'Escape') {
+        closeAllModals();
+        return;
+      }
+
+      if (anyModalOpen) return;
+
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'm') {
+        openModal('modal-map');
+      }
+    });
+
+    // Soporte táctil (swipe izquierda / derecha en móviles y tablets)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const stageEl = document.getElementById('slide-stage');
+    stageEl.addEventListener('touchstart', (e) => {
+      if (e.changedTouches && e.changedTouches[0]) {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+      }
+    }, { passive: true });
+
+    stageEl.addEventListener('touchend', (e) => {
+      if (!e.changedTouches || !e.changedTouches[0]) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        if (dx < 0) nextSlide();
+        else prevSlide();
+      }
+    }, { passive: true });
+
+    document.addEventListener('fullscreenchange', syncFullscreenButton);
+
+    // Arranque inicial
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        renderApp();
+      } catch (err) {
+        console.error('Error al inicializar la presentación:', err);
+      }
+    });
+  </script>
+</body>
+</html>
